@@ -1,0 +1,21 @@
+{
+    "environment": "production",
+    "baseUrl": "https://www.wikipedia.org",
+    "api": {
+        "apiUrl": "https://api.wikimedia.org/core/v1/wikipedia/en"
+    },
+    "wikipedia": {
+        "landingUrl": "https://www.wikipedia.org",
+        "mainPageUrl": "https://en.wikipedia.org/wiki/Main_Page"
+    },
+    "timeouts": {
+        "navigation": 20000,
+        "action": 10000,
+        "assertion": 8000,
+        "defaultDelay": 3000,
+        "explicitWait": 15000,
+        "loaderAppear": 2000,
+        "loaderDisappear": 15000,
+        "pageLoad": 45000
+    }
+}

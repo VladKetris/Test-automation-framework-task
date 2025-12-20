@@ -1,0 +1,242 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.env.local
+.env.production
+.env.staging
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# IDEs and editors
+.idea/
+.vscode/
+.vs/
+*.code-workspace
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.csproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+*~
+/shelf/
+/workspace.xml
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test automation specific
+# Screenshots from test failures
+screenshots/
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Test reports and results
+reports/
+allure-results/
+allure-report/
+.allure/
+logs/
+
+# Claude Code configuration and logs
+.claude/
+
+# Local configuration files (but keep framework configs/)
+config/
+!configs/
+
+# Log directories
+log/
+
+# Playwright specific
+playwright-report/
+test-results/
+.playwright/
+playwright/.cache/
+tests/.auth/
+
+# MCP (Model Context Protocol) cache
+.playwright-mcp/
+
+# Environment and config files with sensitive data
+config/local.json
+config/secrets.json
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+
+# Database files
+*.db
+*.sqlite
+
+# Browser downloads and uploads
+downloads/
+uploads/
+
+# Node.js dependencies and logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Playwright traces and videos
+*.trace.zip
+*.trace
+*.webm
+*.mp4
+
+# Git merge/patch artefacts
+*.orig
+*.rej
+
+# Lock files (optional - uncomment if not tracking)
+# package-lock.json
+# yarn.lock
+# poetry.lock
+/validation_report_11_20.md
+/validation_report_1_10.md
+/validation_report_21_30.md
+/validation_report_31_40.md
+/validation_report_41_50.md
+/validation_report_51_60.md
+/validation_report_61_70.md
+/validation_report_71_80.md
+/validation_report_81_90.md
+/validation_report_91_100.md
