@@ -31,12 +31,14 @@
 | verifyParagraphContainsText() | index: number, expectedText: string | Promise<void> | Verify paragraph at specified index contains expected text |
 | getArticleTitle() | - | Promise<string> | Get article title text |
 | getArticleContent() | - | Promise<string> | Get full article content text |
+| clickEdit() | - | Promise<void> | Click Edit button on the article page |
 | verifyPageOpened() | - | Promise<void> | Verify article page is loaded (inherited) |
 
 **Locators:**
 - Article title: `#firstHeading`
 - Article content: `#mw-content-text`
 - Paragraphs: `#mw-content-text .mw-parser-output > p` (dynamic via `getParagraph(index)`)
+- Edit button: `role=link[name="Edit"]`
 
 ---
 
@@ -65,7 +67,6 @@
 | verifyUsernameDisplayed() | expectedUsername: string | Promise<void> | Verify username in menu |
 | verifyAlertDisplayed() | - | Promise<void> | Verify alert link is displayed |
 | verifyUserLinkDisplayed() | - | Promise<void> | Verify user link is displayed |
-| verifyUserMenuLinkDisplayed() | - | Promise<void> | Verify user menu link is displayed |
 | verifyWatchListLinkDisplayed() | - | Promise<void> | Verify watchlist link is displayed |
 | verifyNotificationsLinkDisplayed() | - | Promise<void> | Verify notifications link is displayed |
 | verifyLogInLinkIsHidden() | - | Promise<void> | Verify log in link is hidden |
@@ -95,9 +96,8 @@
 - Personal tools dropdown button: `role=button[name="Personal tools"]`
 - Log out link: `role=link[name="Log out"]`
 - Search input: `#searchInput`
-- Search toggle link: `role=link[name="Search"]`
-- Search button: `form#searchform button.cdx-search-input__end-button`
-- Main menu checkbox: `#vector-main-menu-dropdown-checkbox`
+- Search button: `role=button[name="Search"]`
+- Main menu button: `role=button[name="Main menu"]`
 - Create new page sidebar link: `a[href='/wiki/Wikipedia:Create_a_new_page']`
 
 ---
@@ -135,6 +135,61 @@
 
 ---
 
+### WikipediaCreatePagePage (tests/pages/WikipediaCreatePagePage.ts)
+**URL:** https://test.wikipedia.org/wiki/Wikipedia:Create_a_new_page
+**Purpose:** Create a new page screen
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| enterPageTitle() | title: string | Promise<void> | Enter page title into the create page input |
+| clickCreateNewPage() | - | Promise<void> | Click Create a new page button |
+| verifyPageOpened() | - | Promise<void> | Verify create page is loaded (inherited) |
+
+**Locators:**
+- Page title input: `role=textbox`
+- Create button: `role=button[name="Create a new page"]`
+- Form locator: `role=heading[name="Wikipedia:Create a new page"]`
+
+---
+
+### WikipediaVisualEditorPage (tests/pages/WikipediaVisualEditorPage.ts)
+**URL:** Varies (Visual Editor for article editing)
+**Purpose:** Visual Editor page for creating/editing articles
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| verifyPageOpened() | - | Promise<void> | Verify Visual Editor page is loaded |
+| verifyPublishButtonDisabled() | - | Promise<void> | Verify Publish button is disabled |
+| verifyEditorHeaderContainsTitle() | expectedTitle: string | Promise<void> | Verify editor header contains the article title |
+| enterContent() | content: string | Promise<void> | Enter content into the editor |
+| deleteAndEnterContent() | content: string | Promise<void> | Delete existing content and enter new content |
+| clickPublish() | - | Promise<void> | Click Publish button |
+
+**Locators:**
+- Editor content: `.ve-ce-branchNode` (first)
+- Publish button: `role=button[name=/^Publish/]`
+- Editor header: `.ve-init-mw-desktopArticleTarget-originalTitle`
+- Form locator: `.ve-init-mw-desktopArticleTarget-targetContainer`
+
+---
+
+### WikipediaSaveChangesDialogPage (tests/pages/WikipediaSaveChangesDialogPage.ts)
+**URL:** N/A (Dialog overlay)
+**Purpose:** Save your changes dialog
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| verifyPageOpened() | - | Promise<void> | Verify Save your changes dialog is displayed |
+| enterEditSummary() | summary: string | Promise<void> | Enter edit summary |
+| clickPublish() | - | Promise<void> | Click Publish button in the dialog |
+
+**Locators:**
+- Edit summary input: `role=textbox[name=/summary\|description/i]`
+- Publish button: `role=button[name=/^Publish/]`
+- Form locator: `role=dialog[hasText="Save your changes"]`
+
+---
+
 ## Method Naming Conventions
 
 ### Actions
@@ -153,6 +208,10 @@
 
 | Date | Page Object | Changes | Updated By |
 |------|-------------|---------|------------|
+| 2025-01-XX | WikipediaArticlePage | Added clickEdit() method | System |
+| 2025-01-XX | WikipediaCreatePagePage | Created new Page Object for create page screen | System |
+| 2025-01-XX | WikipediaVisualEditorPage | Created new Page Object for Visual Editor | System |
+| 2025-01-XX | WikipediaSaveChangesDialogPage | Created new Page Object for save changes dialog | System |
 | 2025-12-22 | WikipediaArticlePage | Created new Page Object for article viewing and assertions | System |
 | 2025-01-XX | All | Removed non-existent Page Objects, updated existing ones with actual methods | System |
 | 2025-01-XX | WikipediaMainPage | Added navigate() method | System |

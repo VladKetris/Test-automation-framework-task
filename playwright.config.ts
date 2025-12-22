@@ -28,7 +28,7 @@ export default defineConfig({
   workers: 4,
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
-    ['@reportportal/agent-js-playwright', rpConfig]
+   // ['@reportportal/agent-js-playwright', rpConfig]
   ],
   use: {
     trace: 'on',

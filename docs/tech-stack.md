@@ -64,14 +64,15 @@ tests/
 └── data/             ← Test data (environment/, auth/)
 
 utils/
-├── api/              ← API Utilities (ApiClient)
-├── config.ts         ← Environment & secrets
-├── decorators.ts     ← @step decorator
-├── parseResponse.ts  ← Zod validation utility
-├── matchers.ts       ← Custom Playwright matchers
-├── TestDataGenerator.ts
-├── TestDataProvider.ts
-└── JsonLoader.ts
+├── api-client.ts        ← HTTP wrapper
+├── config.ts            ← Environment configuration
+├── decorators.ts        ← @step decorator
+├── parse-response.ts    ← Zod validation utility
+├── matchers.ts          ← Custom Playwright matchers
+├── secrets.ts           ← Credentials from env vars
+├── test-data-generator.ts ← Random data (Faker.js)
+├── test-data-provider.ts  ← Static data from JSON
+└── json-loader.ts       ← JSON file loading
 ```
 
 ## Architecture
@@ -99,8 +100,16 @@ Zod Schemas              ← Response validation (in tests)
 
 ## Fixture Chain
 ```
-pages.fixture → api.fixture → steps.fixture
+pages.fixture.ts (base, extends custom matchers)
+       ↓
+api.fixture.ts (adds API services)
+       ↓
+steps.fixture.ts (adds Steps classes)
+       ↓
+index.ts (exports test + expect)
 ```
+
+**Note:** Custom matchers (`toHaveStatusCode`) are extended once at the lowest level (`pages.fixture.ts`) to avoid duplicate extensions.
 
 ## Supported Browsers
 Chromium, Firefox, WebKit
