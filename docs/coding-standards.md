@@ -457,31 +457,35 @@ public getRandomArticle(): string {
 - **Data rule**: constants used by all tests in the file may live at `describe` scope; test-specific constants remain inside each test.
 - **Prefer API setup**: when preconditions are about data, use API Steps rather than UI.
 
-## Test Structure: Global Preconditions with Tags
+## Test Structure: Authentication Preconditions
 
-**Rule:** Use test tags for **global preconditions** that apply across multiple test files.
+**Rule:** For tests requiring authentication, use Steps with credentials passed as parameters.
 
-- **Use tags when**: the same precondition is needed across multiple test files (e.g., authentication).
-- **Available tags**: `@ui_auth` - Automatically authenticates user via UI login flow before test execution.
-- **Location**: Global hooks are defined in `tests/fixtures/global-hooks.fixture.ts`.
-- **Usage**: Add `{ tag: ['@ui_auth'] }` to test definition to trigger automatic authentication.
+- **Read credentials at test level**: Use `getWikipediaCredentials()` from `@utils/secrets`
+- **Pass to Steps**: Call `wikipediaAuthSteps.authenticateUser(username, password)`
+- **Never read secrets inside Steps**: Steps accept credentials as parameters
 
 **Example:**
 ```typescript
-test('Edit article', { tag: ['@ui_auth'] }, async ({
+import { getWikipediaCredentials } from '@utils/secrets';
+
+test('Edit article', async ({
+    wikipediaAuthSteps,
     wikipediaArticlePage,
     wikipediaArticleEditSteps
 }) => {
-    // User is already authenticated by global hook
+    const { username, password } = getWikipediaCredentials();
+    await wikipediaAuthSteps.authenticateUser(username, password);
+    
     await wikipediaArticlePage.clickEdit();
     await wikipediaArticleEditSteps.editContentAndPublish('New content');
 });
 ```
 
 **Benefits:**
-- Eliminates duplicate authentication code across test files
-- Single source of truth for global preconditions
-- Easy to add new global preconditions by adding new tags and hooks
+- Clear data flow (credentials visible at test level)
+- Testable with different credentials
+- Follows "Steps accept data as parameters" pattern
 
 ## Test Structure: Step Comments in Spec Files
 

@@ -171,33 +171,37 @@ test.describe('Wikipedia Account Creation', () => {
 });
 ```
 
-## 5. Test Tags and Global Preconditions
+## 5. Authentication Pattern
 
-Tests can use tags to trigger global preconditions:
+For tests requiring authentication, use the `WikipediaAuthSteps` with credentials passed as parameters:
 
 ```typescript
 import { test } from '@fixtures';
+import { getWikipediaCredentials } from '@utils/secrets';
 
 test.describe('Wikipedia Authenticated Features', () => {
-    // ✅ Test with @ui_auth tag - automatically authenticates before test runs
-    test('Create new article', { tag: ['@ui_auth'] }, async ({
+    test('Create new article', async ({
+        wikipediaAuthSteps,
         wikipediaArticleCreateSteps,
         wikipediaVisualEditorPage
     }) => {
-        // User is already authenticated by global hook
+        // Get credentials at test level
+        const { username, password } = getWikipediaCredentials();
+        
+        // Authenticate user via Steps (credentials passed as parameters)
+        await wikipediaAuthSteps.authenticateUser(username, password);
+        
+        // Continue with authenticated actions
         await wikipediaArticleCreateSteps.navigateToCreateNewPage();
         // ... rest of test
     });
 });
 ```
 
-**Available Tags:**
-- `@ui_auth` - Automatically authenticates user via UI login flow before test execution
-
-**Global Hooks:**
-- Defined in `tests/fixtures/global-hooks.fixture.ts`
-- Automatically run for tests with matching tags
-- No need to duplicate authentication code in each test file
+**Authentication Rules:**
+- Always read credentials at the test level using `getWikipediaCredentials()`
+- Pass credentials as parameters to Steps (never read secrets inside Steps)
+- Use `WikipediaAuthSteps.authenticateUser()` for full login flow
 
 ## Key Patterns Demonstrated
 
@@ -207,4 +211,4 @@ test.describe('Wikipedia Authenticated Features', () => {
 4. **`@step` decorator** - All Steps methods are decorated for reporting
 5. **Random data** - Use `testDataGenerator` for unique test data
 6. **Mixed PO + Steps** - Choose based on business meaning, not line count
-7. **Test tags** - Use `@ui_auth` tag for automatic authentication precondition
+7. **Credentials as parameters** - Read secrets at test level, pass to Steps

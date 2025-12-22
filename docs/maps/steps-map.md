@@ -66,6 +66,8 @@ await wikipediaAuthSteps.authenticateUser(username, password);
 ---
 
 ### WikipediaArticleCreateSteps (tests/steps/WikipediaArticleCreateSteps.ts)
+
+### WikipediaArticleCreateSteps (tests/steps/WikipediaArticleCreateSteps.ts)
 **Fixture:** `wikipediaArticleCreateSteps`
 **Purpose:** Article creation workflow
 
