@@ -10,22 +10,33 @@
 ## Rules
 
 1.  **🔴 CHECK [page-object-map.md](../maps/page-object-map.md) FIRST** - Never create without checking
-2.  **Inherit from `BasePage`**
-3.  **ONE locator per element** - Most reliable verified locator only (see [locators.md](locators.md))
-4.  **Locator reuse** - Prefer existing locators and extend existing Page Objects when needed
-5.  **Direct Playwright API** - Use `Locator` for elements, BasePage methods for checks, `.describe()` for debugging
-6.  **Atomic Actions** - Expose simple actions (click, type, get text), NOT complex business logic
-7.  **Search existing first** - No duplicates allowed
-8.  **ONE Page Object per unique page/URL**
-9.  **Consumed by Steps** - Page Objects are used by Steps classes. Direct usage in Tests is PROHIBITED.
-10. **UPDATE page-object-map.md** - Immediately after creation
-11. **🔴 POPUPS get separate Page Objects** - Always create a dedicated `*PopupPage` class for popups/modals. Small popups don't require separate Steps classes - integrate into parent Steps.
-12. **🔴 NEVER duplicate BasePage methods** - **NEVER override `verifyPageOpened()`**. Ensure the `formLocator` passed to `super()` is the correct unique page identifier, and use the inherited method. Don't create methods like `verifyPopupVisible()`.
-13. **🔴 Expect assertions in BasePage** - Any verification using Playwright expect matchers (like `toHaveTitle`, `toBeVisible`, `toHaveText`, etc.) must be added to `BasePage` as a generic method. Page Objects should call the BasePage method, not use `expect()` directly.
-14. **🔴 JSDoc on all methods** - All public methods in Page Objects must have JSDoc comments describing what they do. Use concise, action-oriented descriptions.
-15. **🔴 Page Object-specific constants** - Constants specific to a Page Object (like page titles, specific text values) must be stored as constants at the top of the Page Object file. Use UPPER_SNAKE_CASE naming.
-16. **🔴 Locator extraction process** - Follow [locators.md](locators.md) methodology for creating new locators. Always verify uniqueness before implementation.
-17. **🔴 Dynamic locators as arrow functions** - For parameterized locators (by index, text, etc.), use arrow function class properties instead of inline creation in methods.
+2.  **🔴 MANDATORY: Locator Verification** - **ALL new locators MUST be verified using MCP browser tools**:
+    - Use `mcp_playwright_browser_navigate` to navigate to target page
+    - Use `mcp_playwright_browser_snapshot` to see page structure
+    - Use `mcp_playwright_browser_evaluate` to verify uniqueness (must return exactly 1 element)
+    - **❌ NEVER create locators without MCP verification** - See [locators.md](locators.md) for full process
+3.  **Inherit from `BasePage`**
+4.  **ONE locator per element** - Most reliable verified locator only (verified via MCP)
+5.  **Locator reuse** - Prefer existing locators and extend existing Page Objects when needed
+6.  **Direct Playwright API** - Use `Locator` for elements, BasePage methods for checks, `.describe()` for debugging
+7.  **Atomic Actions** - Expose simple actions (click, type, get text), NOT complex business logic
+8.  **Search existing first** - No duplicates allowed
+9.  **ONE Page Object per unique page/URL**
+10. **Consumed by Steps** - Page Objects are used by Steps classes. Direct usage in Tests is PROHIBITED.
+11. **UPDATE page-object-map.md** - Immediately after creation
+12. **🔴 POPUPS get separate Page Objects** - Always create a dedicated `*PopupPage` class for popups/modals. Small popups don't require separate Steps classes - integrate into parent Steps.
+13. **🔴 NEVER duplicate BasePage methods** - **NEVER override `verifyPageOpened()`**. Ensure the `formLocator` passed to `super()` is the correct unique page identifier, and use the inherited method. Don't create methods like `verifyPopupVisible()`.
+14. **🔴 UNIQUE formLocator REQUIRED** - The `formLocator` passed to `super()` **MUST be unique to that specific page type** and **MUST NOT appear on other pages**. Use MCP browser tools to verify:
+    - Navigate to the target page and verify the locator exists (returns exactly 1 element)
+    - Navigate to similar/related pages (e.g., Main Page vs Article Page) and verify the locator does NOT exist (returns 0 elements)
+    - Prefer simple, semantic locators (e.g., `page.getByRole('link', { name: 'Edit' })`) over complex structural selectors
+    - **Example:** Article pages use "Edit" link (unique), Main Page uses "View source" (different) - verify both pages to ensure uniqueness
+15. **🔴 Expect assertions in BasePage** - Any verification using Playwright expect matchers (like `toHaveTitle`, `toBeVisible`, `toHaveText`, etc.) must be added to `BasePage` as a generic method. Page Objects should call the BasePage method, not use `expect()` directly.
+16. **🔴 JSDoc on all methods** - All public methods in Page Objects must have JSDoc comments describing what they do. Use concise, action-oriented descriptions.
+17. **🔴 Page Object-specific constants** - Constants specific to a Page Object (like page titles, specific text values) must be stored as constants at the top of the Page Object file. Use UPPER_SNAKE_CASE naming.
+18. **🔴 Locator extraction process** - Follow [locators.md](locators.md) methodology for creating new locators. **MCP verification is MANDATORY** - Always verify uniqueness before implementation.
+19. **🔴 Dynamic locators as arrow functions** - For parameterized locators (by index, text, etc.), use arrow function class properties instead of inline creation in methods. **Use dynamic locators directly** - Call the arrow function directly in methods (e.g., `this.paragraphs(index)`), do not create intermediate variables or helper methods.
+20. **🔴 No unused methods** - Never create methods that are not used in tests. Remove unused methods immediately. Check usage before creating new methods.
 
 ---
 
@@ -251,29 +262,26 @@ export class PageName extends BasePage {
 For locators that depend on parameters (index, text, ID), use **arrow function class properties**:
 
 ```typescript
-export class TablePage extends BasePage {
-    private readonly rows: Locator;
-    
-    // ✅ Arrow functions for parameterized locators
-    private readonly getRow = (index: number): Locator => 
-        this.rows.nth(index);
-    
-    private readonly getCell = (row: number, col: number): Locator => 
-        this.getRow(row).locator('td').nth(col);
-    
-    private readonly getRowByText = (text: string): Locator => 
-        this.rows.filter({ hasText: text });
+export class WikipediaArticlePage extends BasePage {
+    private readonly paragraphs: (index: number) => Locator;
 
     constructor(page: Page) {
-        super(page, page.locator('table'), 'TablePage');
-        this.rows = page.locator('tbody tr').describe('Table rows');
+        super(page, page.getByRole('link', { name: 'Edit' }), 'WikipediaArticlePage');
+        // ✅ Arrow function for parameterized locator
+        this.paragraphs = (index: number) => 
+            page.locator('#mw-content-text .mw-parser-output > p')
+                .nth(index)
+                .describe('Article paragraphs');
     }
 
     /**
-     * Click specific cell
+     * Verify paragraph at specified index contains expected text
      */
-    async clickCell(row: number, col: number): Promise<void> {
-        await this.getCell(row, col).click();
+    async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
+        // ✅ Use dynamic locator directly - no intermediate variables
+        const paragraph = this.paragraphs(index);
+        await this.elementToBeVisible(paragraph);
+        await this.elementToContainText(paragraph, expectedText);
     }
 }
 ```
@@ -284,12 +292,26 @@ export class TablePage extends BasePage {
 - Easy to compose (e.g., `getCell` uses `getRow`)
 - Consistent with static locator pattern
 
-**❌ Avoid inline locator creation:**
+**🔴 Use dynamic locators directly:**
+- ✅ **GOOD**: Call the arrow function directly in methods (e.g., `this.paragraphs(index)`)
+- ❌ **BAD**: Creating intermediate helper methods (e.g., `getParagraph(index)`)
+- ❌ **BAD**: Creating locator inline in method without arrow function property
+
+**❌ Avoid patterns:**
 ```typescript
+// BAD: Intermediate helper method
+private readonly getParagraph = (index: number): Locator =>
+    this.paragraphs.nth(index);
+
+async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
+    const paragraph = this.getParagraph(index); // ❌ Don't create helper methods
+    await this.elementToBeVisible(paragraph);
+}
+
 // BAD: Creating locator inline in method
-async clickCell(row: number, col: number): Promise<void> {
-    const cell = this.rows.nth(row).locator('td').nth(col);
-    await cell.click();
+async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
+    const paragraph = page.locator('#mw-content-text .mw-parser-output > p').nth(index); // ❌ Don't create inline
+    await this.elementToBeVisible(paragraph);
 }
 ```
 

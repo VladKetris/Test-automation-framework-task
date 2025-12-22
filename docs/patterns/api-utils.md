@@ -130,6 +130,12 @@ Domain-specific logic.
 2.  **No Assertions**: Services should only fetch data. Validation happens in tests.
 3.  **Use Routes**: Use `tests/api/routes` for endpoints.
 4.  **Export from Barrel**: All services must be exported from `tests/api/services/index.ts`.
+5.  **🔴 Single Class Per File**: Do not create multiple classes in one API service file. Consolidate related methods into a single class.
+6.  **🔴 Request Models for Structures**: Use request builder classes (extending `BaseRequestBuilder`) for form data, query parameters, and request bodies. Never hardcode request structures inline.
+7.  **🔴 Constants for Parameters**: Extract all hardcoded API parameter values (actions, formats, types, etc.) to constants files in `tests/api/constants/`. Use constants instead of magic strings.
+8.  **🔴 Authentication in AuthService**: All authentication-related methods (OAuth tokens, CSRF tokens, etc.) belong in `AuthService`, not in domain-specific services.
+9.  **🔴 No Unused Methods**: Never create API service methods that are not used in tests. Remove unused methods immediately.
+10. **🔴 JSDoc on All Methods**: All public methods in API services must have JSDoc comments describing what they do.
 
 ```typescript
 // tests/api/services/UserService.ts
@@ -219,11 +225,39 @@ export class UserService {
 
 Build complex payloads with the Builder pattern. Extend `BaseRequestBuilder` to create type-safe request builders for specific endpoints.
 
+**🔴 MANDATORY: Use Request Builders for:**
+- Form data structures (POST/PUT requests)
+- Query parameter objects
+- Request body structures
+- Any structured request data
+
 **Base Class**: `BaseRequestBuilder<T>` provides:
 - `with(overrides)` - Apply overrides to the model
 - `delete(field)` - Remove a field from the model
 - `clone()` - Create a copy of the builder
 - `build()` - Return the final payload
+
+**Pattern**: Create a builder class with a static method that builds the request model:
+
+```typescript
+export class CreatePageRequestModel extends BaseRequestBuilder<CreatePageRequest> {
+    static buildCreatePageRequestModel(
+        title: string,
+        content: string,
+        csrfToken: string,
+        summary?: string
+    ): Partial<CreatePageRequest> {
+        return new CreatePageRequestModel()
+            .with({
+                title,
+                text: content,
+                token: csrfToken,
+                summary: summary ?? 'Automated test page creation',
+                createonly: MediaWikiEditOption.CREATE_ONLY
+            }).build();
+    }
+}
+```
 
 **Example Usage**:
 
@@ -256,6 +290,110 @@ const payload = new CreateUserBuilder()
     .withName('John')
     .withEmail('john@test.com')
     .build();
+```
+
+**❌ BAD: Hardcoded request structures**
+```typescript
+// DON'T DO THIS - hardcoded structure
+return this.client.post(MediaWikiActionRoutes.API, {
+    params: {
+        action: 'edit',
+        format: 'json'
+    },
+    form: {
+        title,
+        text: content,
+        token: csrfToken,
+        summary: summary ?? 'Automated test page creation',
+        createonly: '1'
+    }
+});
+```
+
+**✅ GOOD: Using request builders and constants**
+```typescript
+// DO THIS - use builders and constants
+const formData = CreatePageRequestModel.buildCreatePageRequestModel(
+    title,
+    content,
+    csrfToken,
+    summary
+);
+const queryParams = EditPageQueryParamsModel.buildQueryParams();
+
+return this.client.post(MediaWikiActionRoutes.API, {
+    params: queryParams,
+    form: formData
+});
+```
+
+### API Constants
+
+**🔴 MANDATORY: Extract all API parameter values to constants**
+
+All hardcoded API parameter values must be extracted to constants files in `tests/api/constants/`:
+
+**When to Create Constants:**
+- API actions (e.g., `'query'`, `'edit'`)
+- Response formats (e.g., `'json'`)
+- Meta parameters (e.g., `'tokens'`)
+- Token types (e.g., `'csrf'`)
+- Operation options (e.g., `'1'` for createonly)
+
+**Pattern**: Create domain-specific constants files (e.g., `MediaWikiConstants.ts`):
+
+```typescript
+export const MediaWikiAction = {
+    QUERY: 'query',
+    EDIT: 'edit',
+} as const;
+
+export const MediaWikiFormat = {
+    JSON: 'json',
+} as const;
+
+export const MediaWikiMeta = {
+    TOKENS: 'tokens',
+} as const;
+
+export const MediaWikiTokenType = {
+    CSRF: 'csrf',
+} as const;
+
+export const MediaWikiEditOption = {
+    CREATE_ONLY: '1',
+} as const;
+```
+
+**Usage in Request Builders:**
+```typescript
+import { MediaWikiAction, MediaWikiFormat, MediaWikiEditOption } from '@api/constants';
+
+static buildQueryParams(): Partial<EditPageQueryParams> {
+    return new EditPageQueryParamsModel()
+        .with({
+            action: MediaWikiAction.EDIT,
+            format: MediaWikiFormat.JSON
+        }).build();
+}
+```
+
+**❌ BAD: Hardcoded parameter values**
+```typescript
+.with({
+    action: 'edit',
+    format: 'json',
+    createonly: '1'
+})
+```
+
+**✅ GOOD: Using constants**
+```typescript
+.with({
+    action: MediaWikiAction.EDIT,
+    format: MediaWikiFormat.JSON,
+    createonly: MediaWikiEditOption.CREATE_ONLY
+})
 ```
 
 ### 6. Discovering API Endpoints

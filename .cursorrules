@@ -11,11 +11,23 @@ See [docs/tech-stack.md](docs/tech-stack.md) for architecture overview.
    - Read [docs/maps/steps-map.md](docs/maps/steps-map.md) for existing Steps classes
    - Search for similar methods before creating new ones
 
-2. **Locators policy:**
-   - Use locators/methods from existing Page Objects
-   - Prefer extending existing Page Objects with existing locator patterns already in the project
-   - Avoid creating new locators unless explicitly requested
-   - Follow [docs/patterns/locators.md](docs/patterns/locators.md) for locator extraction methodology
+2. **🔴 MANDATORY: Locator Extraction Process (for NEW locators):**
+   - **Step 1:** Check existing locators in [docs/maps/page-object-map.md](docs/maps/page-object-map.md) and existing Page Objects
+   - **Step 2:** If locator doesn't exist, **MUST use MCP browser tools** to verify:
+     - Navigate to target page using `mcp_playwright_browser_navigate`
+     - Take page snapshot using `mcp_playwright_browser_snapshot`
+     - Extract HTML structure using `mcp_playwright_browser_evaluate`
+     - Verify locator uniqueness (must return exactly 1 element)
+   - **Step 3:** Follow priority strategy from [docs/patterns/locators.md](docs/patterns/locators.md):
+     - Priority 1: Role + Name (`getByRole('button', { name: 'Text' })`)
+     - Priority 2: ID selectors (`#elementId`)
+     - Priority 3: Data attributes (`[data-testid="..."]`)
+     - Priority 4: ARIA labels (`[aria-label="..."]`)
+     - Priority 5: Unique attributes (`[name="..."]`)
+   - **Step 4:** Document verification results before implementing
+   - **❌ NEVER create locators without MCP verification** - Assumptions based on common patterns are NOT allowed
+   - See full methodology: [docs/patterns/locators.md](docs/patterns/locators.md)
+   - See example: [docs/examples/locator-extraction-example.md](docs/examples/locator-extraction-example.md)
 
 ## Architecture
 
@@ -56,25 +68,36 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full coding rules.
 
 ### Page Objects
 - Inherit from `BasePage`
+- **🔴 MANDATORY: Verify ALL new locators with MCP browser tools** before implementation
 - Use `.describe()` on ALL locators
 - Use arrow function class properties for dynamic/parameterized locators
+- **🔴 Use dynamic locators directly** - Call the arrow function directly in methods (e.g., `this.paragraphs(index)`), do not create intermediate variables or helper methods
 - `navigate()` method for page URLs (from environment config)
 - Atomic actions only (click/fill/get)
 - **🔴 Never override `verifyPageOpened()`** (use `super` implementation)
+- **🔴 UNIQUE formLocator REQUIRED** - The `formLocator` passed to `super()` **MUST be unique to that specific page type** and **MUST NOT appear on other pages**. Use MCP browser tools to verify:
+  - Navigate to target page → verify locator exists (exactly 1 element)
+  - Navigate to similar/related pages → verify locator does NOT exist (0 elements)
+  - Prefer simple, semantic locators (e.g., `page.getByRole('link', { name: 'Edit' })`) over complex structural selectors
 - Popups get separate `*PopupPage.ts`
+- **🔴 ONE verified locator per element** - Must verify uniqueness via MCP before coding
+- **🔴 No unused methods** - Never create methods that are not used in tests. Remove unused methods immediately.
 - Pattern: [docs/patterns/page-object.md](docs/patterns/page-object.md)
 - Elements: [docs/patterns/elements.md](docs/patterns/elements.md)
+- Locator extraction: [docs/patterns/locators.md](docs/patterns/locators.md) - **MUST follow 6-step process**
 - Example: [docs/examples/page-object-example.md](docs/examples/page-object-example.md)
+- Locator example: [docs/examples/locator-extraction-example.md](docs/examples/locator-extraction-example.md)
 - Special cases (tables, iframes, alerts): [docs/examples/special-cases.md](docs/examples/special-cases.md)
 
 ### Test Data
 - **Use random data generation wherever possible** - Prefer `randomString()`, `randomUsername()`, etc. over hardcoded values
+- **Use random data for metadata fields** - Edit summaries, descriptions, comments, and similar metadata fields in API operations must use random data (e.g., `randomEditSummary()`)
 - Use `getEnvironment()` for URLs
 - Use `testDataGenerator` for random data (import from `utils/test-data-generator`)
 - Use `testDataProvider` for static/repeatable data (import from `utils/test-data-provider`)
 - Prefer default parameters over magic numbers (e.g., `randomString()` not `randomString(10)`)
 - **Validate test data exists** - All JSON test data must be valid and exist in target system
-- **Random for unique/non-existent**: Use random data for non-existent entities, unique identifiers
+- **Random for unique/non-existent**: Use random data for non-existent entities, unique identifiers, and metadata fields
 - **Static for valid entities**: Use static data from providers for entities that must exist
 - See [docs/patterns/test-data-management.md](docs/patterns/test-data-management.md)
 - Example: [docs/examples/test-data-example.md](docs/examples/test-data-example.md)
@@ -91,6 +114,11 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full coding rules.
 - **Test Data**: Ensure all test data exists and is valid (see test-data-management.md)
 - **Endpoints**: Verify endpoints exist before writing tests, remove tests for non-existent endpoints
 - **No duplicate tests** - Each test must be unique; do not create tests with identical assertions
+- **🔴 Single class per API service file** - Do not create multiple classes in one API service file. Consolidate related methods into a single class.
+- **🔴 Request models for API structures** - Use request builder classes (extending `BaseRequestBuilder`) for form data, query parameters, and request bodies. Never hardcode request structures inline.
+- **🔴 Constants for API parameters** - Extract all hardcoded API parameter values (actions, formats, types, etc.) to constants files in `tests/api/constants/`. Use constants instead of magic strings.
+- **🔴 Authentication methods in AuthService** - All authentication-related methods (OAuth tokens, CSRF tokens, etc.) belong in `AuthService`, not in domain-specific services.
+- **🔴 No unused API methods** - Never create API service methods that are not used in tests. Remove unused methods immediately.
 - See [docs/patterns/api-utils.md](docs/patterns/api-utils.md) for API utilities and validation patterns
 
 ### API Steps
@@ -106,6 +134,8 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full coding rules.
   - `@pages/*` → `tests/pages/*`
   - `@steps/*` → `tests/steps/*`
   - `@api/*` → `tests/api/*`
+  - `@api-steps` → `tests/api-steps` (barrel export)
+  - `@api-steps/*` → `tests/api-steps/*`
   - `@fixtures/*` → `tests/fixtures/*`
   - `@utils/*` → `utils/*`
   - `@data/*` → `tests/data/*`
@@ -114,6 +144,7 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full coding rules.
 - **All modules must be exported from barrel files** - Every new service, page, step class must be added to its `index.ts`
 - **No unused imports** - Remove all unused imports immediately
 - **No relative imports when alias exists** - Use `@utils/config` not `../../utils/config`
+- **Consistent import strategy** - Always use path aliases for imports. Never use relative paths when a path alias exists.
 
 ## Anti-Patterns (NEVER DO)
 
@@ -128,11 +159,16 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full list.
 - ❌ `page.waitForTimeout()` - use auto-waiting
 - ❌ Steps reading secrets internally
 - ❌ Skipping maps check before coding
+- ❌ **Creating locators without MCP browser verification** - MUST use `mcp_playwright_browser_navigate`, `mcp_playwright_browser_snapshot`, and `mcp_playwright_browser_evaluate` to verify uniqueness
+- ❌ **Assuming locator structure** - Never guess based on common patterns; always verify via MCP
+- ❌ **Multiple locators for same element** - ONE verified locator only (verify via MCP first)
+- ❌ **Unused methods** - Never create methods that are not used. Remove unused methods immediately.
 - ❌ Invalid test data in JSON files (must exist in target system)
 - ❌ Tests for non-existent API endpoints (verify endpoints exist)
 - ❌ Services returning parsed JSON (must return raw APIResponse)
 - ❌ Missing schema validation in API tests
 - ❌ Hardcoded unique identifiers or non-existent values (use random data generation)
+- ❌ Hardcoded edit summaries, descriptions, or metadata fields in API operations (use `randomEditSummary()` or similar)
 - ❌ Explanatory comments in tests (`// Steps:`, `// PO:`, `// Zod validates:`) - code should be self-documenting
 - ❌ Bypassing schema validation with `response.json()` - always use `assertSchema()`
 - ❌ Duplicate tests with identical assertions
@@ -140,6 +176,11 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full list.
 - ❌ Relative imports when path alias exists (use `@utils/config` not `../../utils/config`)
 - ❌ Missing barrel exports for new modules (add to `index.ts`)
 - ❌ Inline locator creation in methods (use arrow function class properties for dynamic locators)
+- ❌ **Intermediate helper methods for dynamic locators** - Use dynamic locators directly (e.g., `this.paragraphs(index)`), do not create helper methods like `getParagraph(index)`
+- ❌ **Multiple classes in one API service file** - One class per file. Consolidate related methods into a single class.
+- ❌ **Hardcoded API request structures** - Use request builder classes for form data, query params, and request bodies.
+- ❌ **Hardcoded API parameter values** - Extract all API parameters (actions, formats, types) to constants files.
+- ❌ **Authentication methods in domain services** - All auth methods belong in `AuthService`, not in domain-specific services.
 
 ## After Creating Code
 

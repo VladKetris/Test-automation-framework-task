@@ -36,6 +36,20 @@
 
 ---
 
+## API Steps Classes
+
+### WikipediaAuthApiSteps (tests/api-steps/WikipediaAuthApiSteps.ts)
+**Fixture:** `wikipediaAuthApiSteps`
+**Purpose:** Authentication operations for API requests
+
+| Method | Parameters | Returns | Description | Composite? |
+|--------|------------|---------|-------------|------------|
+| getAccessToken() | - | Promise<string> | Get OAuth access token | ❌ |
+| getCsrfToken() | accessToken: string | Promise<string> | Get CSRF token for edit operations | ❌ |
+| getAuthTokens() | - | Promise<{accessToken: string, csrfToken: string}> | Get both access and CSRF tokens | ✅ |
+
+---
+
 ## Common Patterns
 
 ### Authentication Flow (Mixed PO + Steps)
@@ -58,12 +72,22 @@ await wikipediaMainPage.verifyPageOpened();
 await wikipediaMainSteps.openDirectlyAndVerify();
 ```
 
+### API Authentication Flow
+```typescript
+// Get authentication tokens for API operations
+const { accessToken, csrfToken } = await wikipediaAuthApiSteps.getAuthTokens();
+
+// Use tokens in API calls
+await mediaWikiPageService.createPage(title, content, csrfToken, accessToken, summary);
+```
+
 ---
 
 ## Update History
 
 | Date | Steps Class | Changes |
 |------|-------------|---------|
+| 2025-12-22 | WikipediaAuthApiSteps | Created API Steps for authentication operations | System |
 | 2025-01-XX | All | Updated map to reflect current implementation | System |
 | 2025-12-15 | WikipediaMainSteps | Documented openDirectlyAndVerify() | System |
 | 2025-12-15 | WikipediaLoginSteps | Enhanced verifyPageOpened() with URL/title assertions | System |

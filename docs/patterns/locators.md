@@ -6,47 +6,77 @@ Universal process for creating stable, maintainable UI locators using Playwright
 
 ---
 
-## Process: 6 Steps
+## 🔴 MANDATORY PROCESS - NO EXCEPTIONS
 
-### 1. Check Existing Locators 🚨 MANDATORY
+**This process is MANDATORY. Never create locators without completing ALL 6 steps.**
 
-Before creating ANY new locator:
+### Quick Verification Checklist (Before Writing Code)
 
-1. **Open** [page-object-map.md](../maps/page-object-map.md)
-2. **Search** existing Page Objects for similar elements
-3. **Reuse** existing locators when possible
+Before implementing ANY new locator, you MUST:
 
-```bash
-# Search existing locators
-grep -r "locator\|getByRole" tests/pages/
-```
+- [ ] **Step 1:** Checked [page-object-map.md](../maps/page-object-map.md) and existing Page Objects
+- [ ] **Step 2:** Used `mcp_playwright_browser_navigate` to navigate to target page
+- [ ] **Step 3:** Used `mcp_playwright_browser_snapshot` to see page structure
+- [ ] **Step 4:** Used `mcp_playwright_browser_evaluate` to extract HTML and verify uniqueness
+- [ ] **Step 5:** Verified locator returns exactly 1 element (not 0, not 2+)
+- [ ] **Step 6:** Documented verification results before implementation
 
-**If locator exists** → Use it, don't create new
-**If similar exists** → Extend existing Page Object
-**If none exists** → Continue to Step 2
+**❌ If ANY checkbox is unchecked, DO NOT proceed with implementation**
 
 ---
 
-### 2. MCP Visual Analysis 🚨 MANDATORY
+---
 
-1. Navigate to target page via Playwright MCP
-2. Take page snapshot for visual confirmation
-3. Identify target element AND its container
-4. Confirm element is visible and interactive
+## Process: 6 Steps (ALL MANDATORY)
 
-```
-# Navigate to page
-mcp_playwright_browser_navigate → url: "https://en.wikipedia.org/wiki/Main_Page"
+### 1. Check Existing Locators 🚨 MANDATORY - DO NOT SKIP
 
-# Take snapshot for visual analysis
-mcp_playwright_browser_snapshot
-```
+**Before creating ANY new locator, you MUST:**
 
-**Visual Confirmation Checklist:**
-- [ ] Element location identified
+1. **Open** [page-object-map.md](../maps/page-object-map.md)
+2. **Search** existing Page Objects for similar elements using:
+   ```bash
+   grep -r "locator\|getByRole" tests/pages/
+   ```
+3. **Read** existing Page Object files to understand locator patterns
+4. **Reuse** existing locators when possible
+
+**Decision Tree:**
+- ✅ **Locator exists** → Use it, don't create new
+- ✅ **Similar exists** → Extend existing Page Object
+- ✅ **None exists** → Continue to Step 2 (MCP verification required)
+
+**❌ NEVER proceed to Step 2 without completing Step 1**
+
+---
+
+### 2. MCP Visual Analysis 🚨 MANDATORY - VERIFICATION REQUIRED
+
+**🔴 YOU MUST USE MCP BROWSER TOOLS - NO EXCEPTIONS**
+
+**Required Actions (in order):**
+
+1. **Navigate to target page** using MCP:
+   ```
+   mcp_playwright_browser_navigate → url: "{target_page_url}"
+   ```
+
+2. **Take page snapshot** for visual confirmation:
+   ```
+   mcp_playwright_browser_snapshot
+   ```
+
+3. **Identify target element** in the snapshot
+4. **Identify container/parent structure**
+5. **Confirm element state** (visible, clickable, enabled)
+
+**Visual Confirmation Checklist (MUST complete all):**
+- [ ] Element location identified in snapshot
 - [ ] Container/parent structure understood
-- [ ] Element state (visible, clickable, enabled)
-- [ ] Similar elements nearby (for uniqueness)
+- [ ] Element state confirmed (visible, clickable, enabled)
+- [ ] Similar elements nearby identified (for uniqueness verification)
+
+**❌ NEVER skip MCP verification - Assumptions are NOT allowed**
 
 ---
 
@@ -93,27 +123,67 @@ mcp_playwright_browser_evaluate → function: "document.querySelector('#pt-login
 
 ---
 
-### 5. Validation 🚨 MANDATORY
+### 5. Validation 🚨 MANDATORY - UNIQUENESS VERIFICATION REQUIRED
 
-**Browser-Based Uniqueness Check:**
+**🔴 YOU MUST VERIFY UNIQUENESS VIA MCP - NO EXCEPTIONS**
+
+**Browser-Based Uniqueness Check (MANDATORY):**
 
 ```javascript
 // Run via mcp_playwright_browser_evaluate
+// MUST verify each locator option returns exactly 1 element
 document.querySelectorAll('#wpName1').length  // Must return: 1
+document.querySelectorAll('input[name="wpName"]').length  // Must return: 1
+document.querySelectorAll('.mw-input').length  // Returns 3 → ❌ REJECT
 ```
 
-**Verification Table (document results):**
+**Verification Table (MUST document results):**
 
-| Locator | Page State | Match Count | Result |
-|---------|------------|:-----------:|:------:|
-| `#wpName1` | Login Page | 1 | ✅ |
-| `input[name="wpName"]` | Login Page | 1 | ✅ |
-| `.mw-input` | Login Page | 3 | ❌ |
+| Locator | Page State | Match Count | Result | Action |
+|---------|------------|:-----------:|:------:|--------|
+| `#wpName1` | Login Page | 1 | ✅ | **SELECT** |
+| `input[name="wpName"]` | Login Page | 1 | ✅ | Backup option |
+| `.mw-input` | Login Page | 3 | ❌ | **REJECT** |
 
-**Stability Testing:**
-- [ ] Same locator after page reload
-- [ ] Same across different page states
+**Stability Testing Checklist (MUST verify):**
+- [ ] Same locator after page reload (verify via MCP)
+
+**🔴 SPECIAL REQUIREMENT: formLocator Uniqueness (MANDATORY for Page Objects)**
+
+For `formLocator` (passed to `BasePage` constructor), you **MUST verify uniqueness across different page types**:
+
+1. **Navigate to target page** → Verify locator exists (exactly 1 element)
+2. **Navigate to similar/related pages** → Verify locator does NOT exist (0 elements)
+3. **Prefer simple, semantic locators** over complex structural selectors
+
+**Example Verification Process:**
+```javascript
+// Step 1: Navigate to article page
+mcp_playwright_browser_navigate → url: "https://test.wikipedia.org/wiki/Test"
+mcp_playwright_browser_evaluate → function: "document.querySelectorAll('a[href*=\"action=edit\"]').length"
+// Result: 1 ✅ (Edit link exists on article page)
+
+// Step 2: Navigate to Main Page
+mcp_playwright_browser_navigate → url: "https://test.wikipedia.org/wiki/Main_Page"
+mcp_playwright_browser_evaluate → function: "document.querySelectorAll('a[href*=\"action=edit\"]').length"
+// Result: 0 ✅ (Edit link does NOT exist on Main Page - it has "View source" instead)
+
+// ✅ VERIFIED: formLocator is unique to article pages
+```
+
+**Good Examples:**
+- ✅ `page.getByRole('link', { name: 'Edit' })` - Simple, semantic, unique
+- ✅ `page.locator('#unique-page-container')` - Unique ID that doesn't exist on other pages
+
+**Bad Examples:**
+- ❌ `page.locator('#bodyContent')` - Exists on multiple page types
+- ❌ `page.locator('#mw-content-text')` - Exists on both article pages and Main Page
+- ❌ Complex structural selectors that depend on DOM hierarchy
+- [ ] Same across different page states (logged in/out, etc.)
 - [ ] Independent of dynamic content
+- [ ] Works across viewport sizes (if applicable)
+
+**❌ NEVER implement locator without uniqueness verification**
 
 ---
 
@@ -214,12 +284,15 @@ Before adding locator to Page Object:
 
 | ❌ Don't | ✅ Do |
 |----------|-------|
+| **Create locators without MCP verification** | **ALWAYS use MCP browser tools first** |
+| **Assume locator structure** | **Verify via `mcp_playwright_browser_evaluate`** |
 | Multiple locators for same element | ONE verified locator |
-| Skip uniqueness validation | Always verify count = 1 |
-| Use dynamic/auto-generated IDs | Use stable IDs or roles |
+| Skip uniqueness validation | Always verify count = 1 via MCP |
+| Use dynamic/auto-generated IDs | Use stable IDs or roles (verify first) |
 | Overly broad selectors (`.btn`) | Specific selectors (`#login-btn`) |
 | Skip `.describe()` | Always add descriptions |
 | Create without checking existing | Check page-object-map.md first |
+| Guess based on common patterns | Navigate to page and verify structure |
 
 ---
 

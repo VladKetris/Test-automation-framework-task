@@ -1,6 +1,7 @@
 import { test as pagesTest } from './pages.fixture';
 import { ApiClient } from '@utils/api-client';
 import { SearchService, AuthService, PageService } from '@api/services';
+import { WikipediaAuthApiSteps } from '@api-steps';
 import { getEnvironment } from '@utils/config';
 import { expect } from '@playwright/test';
 import { matchers } from '@utils/matchers';
@@ -20,6 +21,7 @@ type ApiFixtures = {
 
     authService: AuthService;
     pageService: PageService;
+    wikipediaAuthApiSteps: WikipediaAuthApiSteps;
 };
 
 /**
@@ -45,7 +47,7 @@ export const test = pagesTest.extend<ApiFixtures>({
 
     authService: async ({ request }, use) => {
         const env = getEnvironment();
-        const client = new ApiClient(request, env.api.metaRestUrl);
+        const client = new ApiClient(request, env.baseUrl);
         await use(new AuthService(client));
     },
 
@@ -57,7 +59,11 @@ export const test = pagesTest.extend<ApiFixtures>({
 
     pageService: async ({ request }, use) => {
         const env = getEnvironment();
-        const client = new ApiClient(request, env.api.apiUrl);
+        const client = new ApiClient(request, env.baseUrl);
         await use(new PageService(client));
+    },
+
+    wikipediaAuthApiSteps: async ({ authService, pageService }, use) => {
+        await use(new WikipediaAuthApiSteps(authService, pageService));
     },
 });
