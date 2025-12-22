@@ -77,6 +77,7 @@ export function loadJson(relativePath: string): Record<string, unknown> {
 ### When to Use Random Data
 
 **✅ DO use random data for:**
+- **Metadata fields in API operations**: Edit summaries, descriptions, comments, notes, and similar metadata fields must use random data (e.g., `randomEditSummary()`)
 - Unique identifiers (usernames, emails, page titles)
 - Non-existent entities (404 test cases, invalid inputs)
 - Test data that should be unique per test run
@@ -99,8 +100,14 @@ const NON_EXISTENT_PAGE = `NonExistentPage${randomString()}`;
 const username = randomUsername();
 const email = randomEmail();
 
+// ✅ GOOD: Random edit summary for API operations
+const editSummary = randomEditSummary('Automated test');
+
 // ❌ BAD: Hardcoded non-existent page
 const NON_EXISTENT_PAGE = 'NonExistentPage12345XYZ';
+
+// ❌ BAD: Hardcoded edit summary
+const editSummary = 'Automated test article creation';
 
 // ✅ GOOD: Static data for valid article
 const PAGE_TITLE = getRandomArticle(); // From valid articles list
@@ -539,7 +546,7 @@ const { pageTitle, headerTitle } = createArticleTitle('AutoTest');
 | Names | `randomFirstName()`, `randomLastName()`, `randomFullName()` |
 | Contact | `randomEmail()`, `randomMobileNumber()`, `randomPhoneNumber()` |
 | Account | `randomUsername()`, `randomPassword(length?)` |
-| Text | `randomString(length?)`, `randomSentence()`, `randomParagraph()`, `createArticleTitle()` |
+| Text | `randomString(length?)`, `randomSentence()`, `randomParagraph()`, `createArticleTitle()`, `randomEditSummary(prefix?)` |
 | Numbers | `randomNumber(min?, max?)`, `randomDecimal(min?, max?, precision?)` |
 | Dates | `randomPastDate()`, `randomFutureDate()`, `randomBirthdate()` |
 | Internet | `randomUrl()`, `randomCompanyName()` |

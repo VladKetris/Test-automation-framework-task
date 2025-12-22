@@ -203,3 +203,12 @@ export function randomCompanyName(): string {
     return faker.company.name();
 }
 
+/**
+ * Generate a random edit summary/description for API operations
+ * @param prefix - Optional prefix for the summary (default: 'Automated test')
+ * @returns Random edit summary string
+ */
+export function randomEditSummary(prefix: string = 'Automated test'): string {
+    return `${prefix} ${randomString()}`;
+}
+

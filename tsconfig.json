@@ -24,6 +24,8 @@
             "@steps/*": ["tests/steps/*"],
             "@api": ["tests/api"],
             "@api/*": ["tests/api/*"],
+            "@api-steps": ["tests/api-steps"],
+            "@api-steps/*": ["tests/api-steps/*"],
             "@fixtures": ["tests/fixtures"],
             "@fixtures/*": ["tests/fixtures/*"],
             "@utils/*": ["utils/*"],

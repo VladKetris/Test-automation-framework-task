@@ -10,22 +10,33 @@
 ## Rules
 
 1.  **🔴 CHECK [page-object-map.md](../maps/page-object-map.md) FIRST** - Never create without checking
-2.  **Inherit from `BasePage`**
-3.  **ONE locator per element** - Most reliable verified locator only (see [locators.md](locators.md))
-4.  **Locator reuse** - Prefer existing locators and extend existing Page Objects when needed
-5.  **Direct Playwright API** - Use `Locator` for elements, BasePage methods for checks, `.describe()` for debugging
-6.  **Atomic Actions** - Expose simple actions (click, type, get text), NOT complex business logic
-7.  **Search existing first** - No duplicates allowed
-8.  **ONE Page Object per unique page/URL**
-9.  **Consumed by Steps** - Page Objects are used by Steps classes. Direct usage in Tests is PROHIBITED.
-10. **UPDATE page-object-map.md** - Immediately after creation
-11. **🔴 POPUPS get separate Page Objects** - Always create a dedicated `*PopupPage` class for popups/modals. Small popups don't require separate Steps classes - integrate into parent Steps.
-12. **🔴 NEVER duplicate BasePage methods** - **NEVER override `verifyPageOpened()`**. Ensure the `formLocator` passed to `super()` is the correct unique page identifier, and use the inherited method. Don't create methods like `verifyPopupVisible()`.
-13. **🔴 Expect assertions in BasePage** - Any verification using Playwright expect matchers (like `toHaveTitle`, `toBeVisible`, `toHaveText`, etc.) must be added to `BasePage` as a generic method. Page Objects should call the BasePage method, not use `expect()` directly.
-14. **🔴 JSDoc on all methods** - All public methods in Page Objects must have JSDoc comments describing what they do. Use concise, action-oriented descriptions.
-15. **🔴 Page Object-specific constants** - Constants specific to a Page Object (like page titles, specific text values) must be stored as constants at the top of the Page Object file. Use UPPER_SNAKE_CASE naming.
-16. **🔴 Locator extraction process** - Follow [locators.md](locators.md) methodology for creating new locators. Always verify uniqueness before implementation.
-17. **🔴 Dynamic locators as arrow functions** - For parameterized locators (by index, text, etc.), use arrow function class properties instead of inline creation in methods.
+2.  **🔴 MANDATORY: Locator Verification** - **ALL new locators MUST be verified using MCP browser tools**:
+    - Use `mcp_playwright_browser_navigate` to navigate to target page
+    - Use `mcp_playwright_browser_snapshot` to see page structure
+    - Use `mcp_playwright_browser_evaluate` to verify uniqueness (must return exactly 1 element)
+    - **❌ NEVER create locators without MCP verification** - See [locators.md](locators.md) for full process
+3.  **Inherit from `BasePage`**
+4.  **ONE locator per element** - Most reliable verified locator only (verified via MCP)
+5.  **Locator reuse** - Prefer existing locators and extend existing Page Objects when needed
+6.  **Direct Playwright API** - Use `Locator` for elements, BasePage methods for checks, `.describe()` for debugging
+7.  **Atomic Actions** - Expose simple actions (click, type, get text), NOT complex business logic
+8.  **Search existing first** - No duplicates allowed
+9.  **ONE Page Object per unique page/URL**
+10. **Consumed by Steps** - Page Objects are used by Steps classes. Direct usage in Tests is PROHIBITED.
+11. **UPDATE page-object-map.md** - Immediately after creation
+12. **🔴 POPUPS get separate Page Objects** - Always create a dedicated `*PopupPage` class for popups/modals. Small popups don't require separate Steps classes - integrate into parent Steps.
+13. **🔴 NEVER duplicate BasePage methods** - **NEVER override `verifyPageOpened()`**. Ensure the `formLocator` passed to `super()` is the correct unique page identifier, and use the inherited method. Don't create methods like `verifyPopupVisible()`.
+14. **🔴 UNIQUE formLocator REQUIRED** - The `formLocator` passed to `super()` **MUST be unique to that specific page type** and **MUST NOT appear on other pages**. Use MCP browser tools to verify:
+    - Navigate to the target page and verify the locator exists (returns exactly 1 element)
+    - Navigate to similar/related pages (e.g., Main Page vs Article Page) and verify the locator does NOT exist (returns 0 elements)
+    - Prefer simple, semantic locators (e.g., `page.getByRole('link', { name: 'Edit' })`) over complex structural selectors
+    - **Example:** Article pages use "Edit" link (unique), Main Page uses "View source" (different) - verify both pages to ensure uniqueness
+15. **🔴 Expect assertions in BasePage** - Any verification using Playwright expect matchers (like `toHaveTitle`, `toBeVisible`, `toHaveText`, etc.) must be added to `BasePage` as a generic method. Page Objects should call the BasePage method, not use `expect()` directly.
+16. **🔴 JSDoc on all methods** - All public methods in Page Objects must have JSDoc comments describing what they do. Use concise, action-oriented descriptions.
+17. **🔴 Page Object-specific constants** - Constants specific to a Page Object (like page titles, specific text values) must be stored as constants at the top of the Page Object file. Use UPPER_SNAKE_CASE naming.
+18. **🔴 Locator extraction process** - Follow [locators.md](locators.md) methodology for creating new locators. **MCP verification is MANDATORY** - Always verify uniqueness before implementation.
+19. **🔴 Dynamic locators as arrow functions** - For parameterized locators (by index, text, etc.), use arrow function class properties instead of inline creation in methods.
+20. **🔴 No unused methods** - Never create methods that are not used in tests. Remove unused methods immediately. Check usage before creating new methods.
 
 ---
 

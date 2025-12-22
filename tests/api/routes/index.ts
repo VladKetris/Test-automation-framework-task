@@ -1,3 +1,3 @@
 export { SearchRoutes } from './SearchRoutes';
 export { AuthRoutes } from './AuthRoutes';
-export { PageRoutes } from './PageRoutes';
+export { PageRoutes, MediaWikiActionRoutes } from './PageRoutes';

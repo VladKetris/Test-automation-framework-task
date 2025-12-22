@@ -20,6 +20,26 @@
 
 ## Existing Page Objects
 
+### WikipediaArticlePage (tests/pages/WikipediaArticlePage.ts)
+**URL:** https://test.wikipedia.org/wiki/{title}
+**Purpose:** Wikipedia article page for viewing article content
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| verifyArticleTitle() | expectedTitle: string | Promise<void> | Verify article title matches expected text |
+| verifyArticleContainsText() | expectedText: string | Promise<void> | Verify article content contains expected text |
+| verifyFirstParagraphContainsText() | expectedText: string | Promise<void> | Verify first paragraph contains expected text |
+| getArticleTitle() | - | Promise<string> | Get article title text |
+| getArticleContent() | - | Promise<string> | Get full article content text |
+| verifyPageOpened() | - | Promise<void> | Verify article page is loaded (inherited) |
+
+**Locators:**
+- Article title: `#firstHeading`
+- Article content: `#mw-content-text`
+- First paragraph: `#mw-content-text .mw-parser-output > p` (first)
+
+---
+
 ### WikipediaMainPage (tests/pages/WikipediaMainPage.ts)
 **URL:** https://en.wikipedia.org/wiki/Main_Page
 **Purpose:** English Wikipedia main page
@@ -133,6 +153,7 @@
 
 | Date | Page Object | Changes | Updated By |
 |------|-------------|---------|------------|
+| 2025-12-22 | WikipediaArticlePage | Created new Page Object for article viewing and assertions | System |
 | 2025-01-XX | All | Removed non-existent Page Objects, updated existing ones with actual methods | System |
 | 2025-01-XX | WikipediaMainPage | Added navigate() method | System |
 | 2025-01-XX | WikipediaLoginPage | Added verifyLoginPageTitle() method | System |

@@ -11,5 +11,9 @@ export {
 export { 
     PageBareSchema, 
     PageBareWithTitleSchema,
-    type PageBareResponse 
+    CsrfTokenSchema,
+    PageEditSuccessSchema,
+    type PageBareResponse,
+    type CsrfTokenResponse,
+    type PageEditSuccessResponse
 } from './PageSchema';

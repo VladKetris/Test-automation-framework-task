@@ -2,6 +2,7 @@ import { test as base } from '@playwright/test';
 
 // Page Objects imports
 import {
+    WikipediaArticlePage,
     WikipediaMainPage,
     WikipediaLoginPage,
     WikipediaNavigationMenu,
@@ -12,6 +13,7 @@ import {
  * Page Object fixtures - creates all PO instances
  */
 type PagesFixtures = {
+    wikipediaArticlePage: WikipediaArticlePage;
     wikipediaMainPage: WikipediaMainPage;
     wikipediaLoginPage: WikipediaLoginPage;
     wikipediaNavigationMenu: WikipediaNavigationMenu;
@@ -24,6 +26,10 @@ export type AllPagesFixtures = PagesFixtures;
 export const test = base.extend<AllPagesFixtures>({
 
     // ==================== Page Objects ====================
+    wikipediaArticlePage: async ({ page }, use) => {
+        await use(new WikipediaArticlePage(page));
+    },
+
     wikipediaMainPage: async ({ page }, use) => {
         await use(new WikipediaMainPage(page));
     },
