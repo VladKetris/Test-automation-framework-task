@@ -66,8 +66,6 @@ await wikipediaAuthSteps.authenticateUser(username, password);
 ---
 
 ### WikipediaArticleCreateSteps (tests/steps/WikipediaArticleCreateSteps.ts)
-
-### WikipediaArticleCreateSteps (tests/steps/WikipediaArticleCreateSteps.ts)
 **Fixture:** `wikipediaArticleCreateSteps`
 **Purpose:** Article creation workflow
 
@@ -145,23 +143,26 @@ const { accessToken, csrfToken } = await wikipediaAuthApiSteps.getAuthTokens();
 await mediaWikiPageService.createPage(title, content, csrfToken, accessToken, summary);
 ```
 
-### Global Authentication Precondition (Tag-based)
+### Authentication in Tests
 ```typescript
-// Test with @ui_auth tag - automatically authenticates before test runs
-test('Edit article', { tag: ['@ui_auth'] }, async ({
+import { getWikipediaCredentials } from '@utils/secrets';
+
+test('Edit article', async ({
+    wikipediaAuthSteps,
     wikipediaArticlePage,
     wikipediaArticleEditSteps
 }) => {
-    // User is already authenticated by global hook
+    // Read credentials at test level
+    const { username, password } = getWikipediaCredentials();
+    
+    // Pass to Steps as parameters
+    await wikipediaAuthSteps.authenticateUser(username, password);
+    
+    // Continue with authenticated actions
     await wikipediaArticlePage.clickEdit();
     await wikipediaArticleEditSteps.editContentAndPublish('New content');
 });
 ```
-
-**How it works:**
-- Global hook in `tests/fixtures/global-hooks.fixture.ts` checks for `@ui_auth` tag
-- If tag is present, automatically calls `wikipediaAuthSteps.authenticateUser()`
-- No need to duplicate authentication code in each test file
 
 ---
 
@@ -169,14 +170,11 @@ test('Edit article', { tag: ['@ui_auth'] }, async ({
 
 | Date | Steps Class | Changes |
 |------|-------------|---------|
-| 2025-01-XX | WikipediaAuthSteps | Created Steps class for UI authentication, used by @ui_auth global hook | System |
+| 2025-12-22 | WikipediaAuthSteps | Updated to accept credentials as parameters | System |
+| 2025-12-22 | WikipediaAuthApiSteps | Created API Steps for authentication operations | System |
 | 2025-01-XX | WikipediaSearchSteps | Created new Steps class for search functionality | System |
 | 2025-01-XX | WikipediaArticleCreateSteps | Created composite method for creating new page with title | System |
 | 2025-01-XX | WikipediaArticleEditSteps | Created composite method for editing article content and publishing | System |
-| 2025-01-XX | WikipediaVisualEditorSteps | Removed - methods were single PO calls, use PO directly | System |
-| 2025-01-XX | WikipediaArticleSteps | Removed - methods were single PO calls, use PO directly | System |
-| 2025-12-22 | WikipediaAuthApiSteps | Created API Steps for authentication operations | System |
-| 2025-01-XX | All | Updated map to reflect current implementation | System |
 | 2025-12-15 | WikipediaMainSteps | Documented openDirectlyAndVerify() | System |
 | 2025-12-15 | WikipediaLoginSteps | Enhanced verifyPageOpened() with URL/title assertions | System |
 | 2025-12-03 | All | Initial creation | System |
