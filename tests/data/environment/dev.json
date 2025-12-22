@@ -1,0 +1,22 @@
+{
+    "environment": "dev",
+    "baseUrl": "https://test.wikipedia.org",
+    "api": {
+        "apiUrl": "https://api.wikimedia.org/core/v1/wikipedia/en",
+        "metaRestUrl": "https://meta.wikimedia.org/w/rest.php"
+    },
+    "wikipedia": {
+        "landingUrl": "https://test.wikipedia.org",
+        "mainPageUrl": "https://test.wikipedia.org/wiki/Main_Page"
+    },
+    "timeouts": {
+        "navigation": 10000,
+        "action": 5000,
+        "assertion": 10000,
+        "defaultDelay": 2000,
+        "explicitWait": 10000,
+        "loaderAppear": 1000,
+        "loaderDisappear": 10000,
+        "pageLoad": 15000
+    }
+}

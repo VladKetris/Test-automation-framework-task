@@ -1,0 +1,36 @@
+{
+    "compilerOptions": {
+        "target": "ES2019",
+        "module": "commonjs",
+        "noEmit": true,
+        "lib": [
+            "esnext",
+            "dom",
+            "dom.iterable"
+        ],
+        "types": [
+            "node"
+        ],
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "paths": {
+            "@pages": ["tests/pages"],
+            "@pages/*": ["tests/pages/*"],
+            "@steps": ["tests/steps"],
+            "@steps/*": ["tests/steps/*"],
+            "@api": ["tests/api"],
+            "@api/*": ["tests/api/*"],
+            "@fixtures": ["tests/fixtures"],
+            "@fixtures/*": ["tests/fixtures/*"],
+            "@utils/*": ["utils/*"],
+            "@data/*": ["tests/data/*"]
+        }
+    },
+    "include": [
+        "**/*.ts"
+    ]
+}
