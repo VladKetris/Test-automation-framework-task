@@ -171,6 +171,34 @@ test.describe('Wikipedia Account Creation', () => {
 });
 ```
 
+## 5. Test Tags and Global Preconditions
+
+Tests can use tags to trigger global preconditions:
+
+```typescript
+import { test } from '@fixtures';
+
+test.describe('Wikipedia Authenticated Features', () => {
+    // ✅ Test with @ui_auth tag - automatically authenticates before test runs
+    test('Create new article', { tag: ['@ui_auth'] }, async ({
+        wikipediaArticleCreateSteps,
+        wikipediaVisualEditorPage
+    }) => {
+        // User is already authenticated by global hook
+        await wikipediaArticleCreateSteps.navigateToCreateNewPage();
+        // ... rest of test
+    });
+});
+```
+
+**Available Tags:**
+- `@ui_auth` - Automatically authenticates user via UI login flow before test execution
+
+**Global Hooks:**
+- Defined in `tests/fixtures/global-hooks.fixture.ts`
+- Automatically run for tests with matching tags
+- No need to duplicate authentication code in each test file
+
 ## Key Patterns Demonstrated
 
 1. **Test constants** - No magic values, use named constants
@@ -179,3 +207,4 @@ test.describe('Wikipedia Account Creation', () => {
 4. **`@step` decorator** - All Steps methods are decorated for reporting
 5. **Random data** - Use `testDataGenerator` for unique test data
 6. **Mixed PO + Steps** - Choose based on business meaning, not line count
+7. **Test tags** - Use `@ui_auth` tag for automatic authentication precondition

@@ -71,6 +71,13 @@ Choose based on intent, not line count. Keep test-specific constants inside the 
 - Keep test-specific data/constants **inside the test** unless it truly applies to every test
 - Prefer **API Steps** for setup/teardown when possible (faster and more reliable than UI)
 
+**Global Preconditions (Tag-based)**
+- Use test tags for **global preconditions** that apply across multiple test files
+- Tag `@ui_auth` automatically authenticates the user before the test runs
+- Global hooks are defined in `tests/fixtures/global-hooks.fixture.ts`
+- Tests with `{ tag: ['@ui_auth'] }` will automatically run authentication before test execution
+- Example: `test('My test', { tag: ['@ui_auth'] }, async ({ ... }) => { ... });`
+
 **Assertions (URL)**
 - 🔴 **Never assert URLs** in tests/steps/page objects. Use page-level UI signals (heading/content/title) instead.
 

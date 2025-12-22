@@ -2,9 +2,10 @@
     "articles": [
         "Earth",
         "Python",
-        "London",
-        "Computer",
-        "Science",
-        "History"
+        "London"
+    ],
+    "editableArticles": [
+        "TestPage85611",
+        "TestPage89969"
     ]
 }

@@ -70,8 +70,12 @@ Feature: User Authentication
 
 ```gherkin
 @smoke @regression @integration @ui @api @navigation @download
+@ui_auth  # Global precondition: automatically authenticates user via UI
 @test_01 @test_02 @test_03  # Individual test identification
 ```
+
+**Special Tags:**
+- `@ui_auth` - Triggers global authentication precondition. Tests with this tag will automatically authenticate the user before execution. Defined in `tests/fixtures/global-hooks.fixture.ts`.
 
 ## How AI Translates Scenarios
 
@@ -105,6 +109,20 @@ test('Test 01: Create account successfully',
     await wikipediaCreateAccountSteps.fillAccountForm(username, password);  // Steps: composite
     await wikipediaCreateAccountSteps.clickCreateAccount();
     await wikipediaCreateAccountSteps.verifyAndDismissGetStartedPopup(expectedMessage);
+});
+```
+
+**Example with @ui_auth tag:**
+```typescript
+test('Test 02: Edit article as authenticated user', 
+  { tag: ['@ui_auth', '@test_02'] }, 
+  async ({ 
+    wikipediaArticlePage,
+    wikipediaArticleEditSteps
+  }) => {
+    // User is already authenticated by global hook
+    await wikipediaArticlePage.clickEdit();
+    await wikipediaArticleEditSteps.editContentAndPublish('New content');
 });
 ```
 

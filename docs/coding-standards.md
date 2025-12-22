@@ -45,7 +45,7 @@ pnpm typecheck && pnpm lint
 - **Async/Await**: Always use `async/await` for Playwright interactions.
 - **Explicit Return Types**: Define return types for all methods.
 - **Meaningful Names**: Descriptive variable and function names.
-- **JSDoc**: Documentation for classes and public methods. **All Page Object methods must have JSDoc comments.**
+- **JSDoc**: Documentation for classes and public methods with non-obvious behavior. Simple self-documenting methods (like `clickLogin()`) may omit JSDoc if the method name clearly conveys intent.
 - **Assertion Standards**: Use custom matchers (`toHaveStatusCode`) and schema validation helpers (`assertSchema`).
 
 ---
@@ -449,13 +449,39 @@ public getRandomArticle(): string {
 
 ## Test Structure: Preconditions
 
-**Rule:** If a test has a **reusable precondition** (e.g., “log in as a specific user”), implement it in `test.beforeEach(...)` inside the same `test.describe(...)` block.
+**Rule:** If a test has a **reusable precondition** (e.g., "log in as a specific user"), implement it in `test.beforeEach(...)` inside the same `test.describe(...)` block.
 
 - **Use `beforeEach` when**: every test in the file needs the same setup (login, navigation to a starting page, common API setup).
-- **Do not use `beforeEach` for**: steps that are specific to only one test’s scenario (keep those inside the test).
+- **Do not use `beforeEach` for**: steps that are specific to only one test's scenario (keep those inside the test).
 - **Keep it Steps-only**: `beforeEach` must call **Steps** methods only (same as spec tests).
 - **Data rule**: constants used by all tests in the file may live at `describe` scope; test-specific constants remain inside each test.
 - **Prefer API setup**: when preconditions are about data, use API Steps rather than UI.
+
+## Test Structure: Global Preconditions with Tags
+
+**Rule:** Use test tags for **global preconditions** that apply across multiple test files.
+
+- **Use tags when**: the same precondition is needed across multiple test files (e.g., authentication).
+- **Available tags**: `@ui_auth` - Automatically authenticates user via UI login flow before test execution.
+- **Location**: Global hooks are defined in `tests/fixtures/global-hooks.fixture.ts`.
+- **Usage**: Add `{ tag: ['@ui_auth'] }` to test definition to trigger automatic authentication.
+
+**Example:**
+```typescript
+test('Edit article', { tag: ['@ui_auth'] }, async ({
+    wikipediaArticlePage,
+    wikipediaArticleEditSteps
+}) => {
+    // User is already authenticated by global hook
+    await wikipediaArticlePage.clickEdit();
+    await wikipediaArticleEditSteps.editContentAndPublish('New content');
+});
+```
+
+**Benefits:**
+- Eliminates duplicate authentication code across test files
+- Single source of truth for global preconditions
+- Easy to add new global preconditions by adding new tags and hooks
 
 ## Test Structure: Step Comments in Spec Files
 
@@ -694,8 +720,11 @@ await assertSchema(response, AccessTokenSchema, 'Access Token Response');
 ❌ Import Secrets in tests → Use TestDataProvider instead
 ❌ **Explanatory comments in tests** → Let code be self-documenting
 ❌ **Throwing errors in utility functions** → Return undefined/null instead
-❌ **Direct expect() in Page Objects** → Use BasePage assertion methods (toHaveTitle, toBeVisible, etc.)
-❌ **Missing JSDoc on Page Object methods** → All public methods must have JSDoc comments
+❌ **Direct expect() in Page Objects** → Use BasePage assertion methods (elementToContainText, elementToBeVisible, etc.)
+❌ **Duplicate locators for same element** → ONE verified locator per element
+❌ **Unused locators or methods** → Remove unused code immediately
+❌ **Steps reading secrets internally** → Accept credentials as parameters, read secrets at test level
+❌ **Missing JSDoc on complex Page Object methods** → Methods with non-obvious behavior must have JSDoc comments (simple self-documenting methods like `clickLogin()` may omit JSDoc)
 ❌ **Magic values in Page Objects** → Store Page Object-specific constants at top of file (page titles, specific text values)
 ❌ **Examples in utils documentation** → Use simple descriptions only, no `@example` blocks
 ❌ **Missing @param/@returns in utils docs** → All utils functions must have `@param` and `@returns` tags

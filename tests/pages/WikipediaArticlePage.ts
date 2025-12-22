@@ -5,16 +5,18 @@ export class WikipediaArticlePage extends BasePage {
     private readonly articleTitle: Locator;
     private readonly articleContent: Locator;
     private readonly paragraphs: (index: number) => Locator;
+    private readonly editButton: Locator;
 
     constructor(page: Page) {
         super(
             page,
-            page.getByRole('link', { name: 'Edit' }),
+            page.locator('#ca-edit'),
             'WikipediaArticlePage'
         );
         this.articleTitle = page.locator('#firstHeading').describe('Article title heading');
         this.articleContent = page.locator('#mw-content-text').describe('Article content container');
         this.paragraphs = (index: number) => page.locator('#mw-content-text .mw-parser-output > p').nth(index).describe('Article paragraphs');
+        this.editButton = page.locator('#ca-edit a').describe('Edit button');
     }
 
     /**
@@ -62,6 +64,14 @@ export class WikipediaArticlePage extends BasePage {
     async getArticleContent(): Promise<string> {
         await this.elementToBeVisible(this.articleContent);
         return this.articleContent.innerText();
+    }
+
+    /**
+     * Click Edit button on the article page
+     */
+    async clickEdit(): Promise<void> {
+        await this.elementToBeVisible(this.editButton);
+        await this.editButton.click();
     }
 }
 
