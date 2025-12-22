@@ -19,19 +19,11 @@ export class WikipediaArticlePage extends BasePage {
         this.editButton = page.locator('#ca-edit a').describe('Edit button');
     }
 
-    /**
-     * Verify article title matches expected text
-     * @param expectedTitle Expected article title
-     */
     async verifyArticleTitle(expectedTitle: string): Promise<void> {
         await this.elementToBeVisible(this.articleTitle);
         await this.elementToHaveText(this.articleTitle, expectedTitle);
     }
 
-    /**
-     * Verify article content contains expected text
-     * @param expectedText Expected text in article content
-     */
     async verifyArticleContainsText(expectedText: string): Promise<void> {
         await this.elementToBeVisible(this.articleContent);
         await this.elementToContainText(this.articleContent, expectedText);
@@ -40,7 +32,7 @@ export class WikipediaArticlePage extends BasePage {
     /**
      * Verify paragraph at specified index contains expected text
      * @param expectedText Expected text in paragraph
-     * @param index Paragraph index (0-based, defaults to 0 for first paragraph)
+     * @param index Paragraph index (0-based, defaults to 0)
      */
     async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
         const paragraph = this.paragraphs(index);
@@ -48,27 +40,16 @@ export class WikipediaArticlePage extends BasePage {
         await this.elementToContainText(paragraph, expectedText);
     }
 
-    /**
-     * Get article title text
-     * @returns Article title text
-     */
     async getArticleTitle(): Promise<string> {
         await this.elementToBeVisible(this.articleTitle);
         return this.articleTitle.innerText();
     }
 
-    /**
-     * Get article content text
-     * @returns Full article content text
-     */
     async getArticleContent(): Promise<string> {
         await this.elementToBeVisible(this.articleContent);
         return this.articleContent.innerText();
     }
 
-    /**
-     * Click Edit button on the article page
-     */
     async clickEdit(): Promise<void> {
         await this.elementToBeVisible(this.editButton);
         await this.editButton.click();

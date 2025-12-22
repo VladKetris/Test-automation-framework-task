@@ -15,17 +15,11 @@ export class WikipediaCreatePagePage extends BasePage {
         this.createButton = page.getByRole('button', { name: 'Create a new page' }).describe('Create a new page button');
     }
 
-    /**
-     * Enter page title into the create page input
-     */
     async enterPageTitle(title: string): Promise<void> {
         await this.elementToBeVisible(this.pageTitleInput);
         await this.pageTitleInput.fill(title);
     }
 
-    /**
-     * Click Create a new page button
-     */
     async clickCreateNewPage(): Promise<void> {
         await this.elementToBeVisible(this.createButton);
         await this.createButton.click();

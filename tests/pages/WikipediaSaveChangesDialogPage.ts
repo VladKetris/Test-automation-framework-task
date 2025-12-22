@@ -15,17 +15,11 @@ export class WikipediaSaveChangesDialogPage extends BasePage {
         this.publishButton = page.getByRole('button', { name: /^Publish/ }).describe('Publish button in dialog');
     }
 
-    /**
-     * Enter edit summary
-     */
     async enterEditSummary(summary: string): Promise<void> {
         await this.elementToBeVisible(this.editSummaryInput);
         await this.editSummaryInput.fill(summary);
     }
 
-    /**
-     * Click Publish button in the dialog
-     */
     async clickPublish(): Promise<void> {
         await this.elementToBeVisible(this.publishButton);
         await this.publishButton.click();
