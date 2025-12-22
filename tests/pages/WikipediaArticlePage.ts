@@ -4,7 +4,7 @@ import { BasePage } from './BasePage';
 export class WikipediaArticlePage extends BasePage {
     private readonly articleTitle: Locator;
     private readonly articleContent: Locator;
-    private readonly firstParagraph: Locator;
+    private readonly paragraphs: (index: number) => Locator;
 
     constructor(page: Page) {
         super(
@@ -14,7 +14,7 @@ export class WikipediaArticlePage extends BasePage {
         );
         this.articleTitle = page.locator('#firstHeading').describe('Article title heading');
         this.articleContent = page.locator('#mw-content-text').describe('Article content container');
-        this.firstParagraph = page.locator('#mw-content-text .mw-parser-output > p').first().describe('First paragraph of article');
+        this.paragraphs = (index: number) => page.locator('#mw-content-text .mw-parser-output > p').nth(index).describe('Article paragraphs');
     }
 
     /**
@@ -36,12 +36,14 @@ export class WikipediaArticlePage extends BasePage {
     }
 
     /**
-     * Verify first paragraph contains expected text
-     * @param expectedText Expected text in first paragraph
+     * Verify paragraph at specified index contains expected text
+     * @param expectedText Expected text in paragraph
+     * @param index Paragraph index (0-based, defaults to 0 for first paragraph)
      */
-    async verifyFirstParagraphContainsText(expectedText: string): Promise<void> {
-        await this.elementToBeVisible(this.firstParagraph);
-        await this.elementToContainText(this.firstParagraph, expectedText);
+    async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
+        const paragraph = this.paragraphs(index);
+        await this.elementToBeVisible(paragraph);
+        await this.elementToContainText(paragraph, expectedText);
     }
 
     /**

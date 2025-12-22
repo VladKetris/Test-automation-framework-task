@@ -35,7 +35,7 @@
 16. **🔴 JSDoc on all methods** - All public methods in Page Objects must have JSDoc comments describing what they do. Use concise, action-oriented descriptions.
 17. **🔴 Page Object-specific constants** - Constants specific to a Page Object (like page titles, specific text values) must be stored as constants at the top of the Page Object file. Use UPPER_SNAKE_CASE naming.
 18. **🔴 Locator extraction process** - Follow [locators.md](locators.md) methodology for creating new locators. **MCP verification is MANDATORY** - Always verify uniqueness before implementation.
-19. **🔴 Dynamic locators as arrow functions** - For parameterized locators (by index, text, etc.), use arrow function class properties instead of inline creation in methods.
+19. **🔴 Dynamic locators as arrow functions** - For parameterized locators (by index, text, etc.), use arrow function class properties instead of inline creation in methods. **Use dynamic locators directly** - Call the arrow function directly in methods (e.g., `this.paragraphs(index)`), do not create intermediate variables or helper methods.
 20. **🔴 No unused methods** - Never create methods that are not used in tests. Remove unused methods immediately. Check usage before creating new methods.
 
 ---
@@ -262,29 +262,26 @@ export class PageName extends BasePage {
 For locators that depend on parameters (index, text, ID), use **arrow function class properties**:
 
 ```typescript
-export class TablePage extends BasePage {
-    private readonly rows: Locator;
-    
-    // ✅ Arrow functions for parameterized locators
-    private readonly getRow = (index: number): Locator => 
-        this.rows.nth(index);
-    
-    private readonly getCell = (row: number, col: number): Locator => 
-        this.getRow(row).locator('td').nth(col);
-    
-    private readonly getRowByText = (text: string): Locator => 
-        this.rows.filter({ hasText: text });
+export class WikipediaArticlePage extends BasePage {
+    private readonly paragraphs: (index: number) => Locator;
 
     constructor(page: Page) {
-        super(page, page.locator('table'), 'TablePage');
-        this.rows = page.locator('tbody tr').describe('Table rows');
+        super(page, page.getByRole('link', { name: 'Edit' }), 'WikipediaArticlePage');
+        // ✅ Arrow function for parameterized locator
+        this.paragraphs = (index: number) => 
+            page.locator('#mw-content-text .mw-parser-output > p')
+                .nth(index)
+                .describe('Article paragraphs');
     }
 
     /**
-     * Click specific cell
+     * Verify paragraph at specified index contains expected text
      */
-    async clickCell(row: number, col: number): Promise<void> {
-        await this.getCell(row, col).click();
+    async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
+        // ✅ Use dynamic locator directly - no intermediate variables
+        const paragraph = this.paragraphs(index);
+        await this.elementToBeVisible(paragraph);
+        await this.elementToContainText(paragraph, expectedText);
     }
 }
 ```
@@ -295,12 +292,26 @@ export class TablePage extends BasePage {
 - Easy to compose (e.g., `getCell` uses `getRow`)
 - Consistent with static locator pattern
 
-**❌ Avoid inline locator creation:**
+**🔴 Use dynamic locators directly:**
+- ✅ **GOOD**: Call the arrow function directly in methods (e.g., `this.paragraphs(index)`)
+- ❌ **BAD**: Creating intermediate helper methods (e.g., `getParagraph(index)`)
+- ❌ **BAD**: Creating locator inline in method without arrow function property
+
+**❌ Avoid patterns:**
 ```typescript
+// BAD: Intermediate helper method
+private readonly getParagraph = (index: number): Locator =>
+    this.paragraphs.nth(index);
+
+async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
+    const paragraph = this.getParagraph(index); // ❌ Don't create helper methods
+    await this.elementToBeVisible(paragraph);
+}
+
 // BAD: Creating locator inline in method
-async clickCell(row: number, col: number): Promise<void> {
-    const cell = this.rows.nth(row).locator('td').nth(col);
-    await cell.click();
+async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
+    const paragraph = page.locator('#mw-content-text .mw-parser-output > p').nth(index); // ❌ Don't create inline
+    await this.elementToBeVisible(paragraph);
 }
 ```
 

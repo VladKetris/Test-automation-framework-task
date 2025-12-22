@@ -71,6 +71,7 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full coding rules.
 - **🔴 MANDATORY: Verify ALL new locators with MCP browser tools** before implementation
 - Use `.describe()` on ALL locators
 - Use arrow function class properties for dynamic/parameterized locators
+- **🔴 Use dynamic locators directly** - Call the arrow function directly in methods (e.g., `this.paragraphs(index)`), do not create intermediate variables or helper methods
 - `navigate()` method for page URLs (from environment config)
 - Atomic actions only (click/fill/get)
 - **🔴 Never override `verifyPageOpened()`** (use `super` implementation)
@@ -175,6 +176,7 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full list.
 - ❌ Relative imports when path alias exists (use `@utils/config` not `../../utils/config`)
 - ❌ Missing barrel exports for new modules (add to `index.ts`)
 - ❌ Inline locator creation in methods (use arrow function class properties for dynamic locators)
+- ❌ **Intermediate helper methods for dynamic locators** - Use dynamic locators directly (e.g., `this.paragraphs(index)`), do not create helper methods like `getParagraph(index)`
 - ❌ **Multiple classes in one API service file** - One class per file. Consolidate related methods into a single class.
 - ❌ **Hardcoded API request structures** - Use request builder classes for form data, query params, and request bodies.
 - ❌ **Hardcoded API parameter values** - Extract all API parameters (actions, formats, types) to constants files.

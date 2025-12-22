@@ -28,7 +28,7 @@
 |--------|------------|---------|-------------|
 | verifyArticleTitle() | expectedTitle: string | Promise<void> | Verify article title matches expected text |
 | verifyArticleContainsText() | expectedText: string | Promise<void> | Verify article content contains expected text |
-| verifyFirstParagraphContainsText() | expectedText: string | Promise<void> | Verify first paragraph contains expected text |
+| verifyParagraphContainsText() | index: number, expectedText: string | Promise<void> | Verify paragraph at specified index contains expected text |
 | getArticleTitle() | - | Promise<string> | Get article title text |
 | getArticleContent() | - | Promise<string> | Get full article content text |
 | verifyPageOpened() | - | Promise<void> | Verify article page is loaded (inherited) |
@@ -36,7 +36,7 @@
 **Locators:**
 - Article title: `#firstHeading`
 - Article content: `#mw-content-text`
-- First paragraph: `#mw-content-text .mw-parser-output > p` (first)
+- Paragraphs: `#mw-content-text .mw-parser-output > p` (dynamic via `getParagraph(index)`)
 
 ---
 
