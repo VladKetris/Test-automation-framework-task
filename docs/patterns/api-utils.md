@@ -110,6 +110,7 @@ Mirrors Playwright's `APIRequestContext` methods exactly, only adding base URL h
 
 ```typescript
 import { ApiClient } from '@utils/api-client';
+import { StatusCode } from '@api';
 
 // Same signature as request.get(), returns native APIResponse
 const response = await apiClient.get('/search/page', {
@@ -117,7 +118,7 @@ const response = await apiClient.get('/search/page', {
 });
 
 const data = await response.json();
-expect(response.status()).toBe(200);
+expect(response.status()).toBe(StatusCode.OK);
 ```
 
 ### 3. API Services (`tests/api/services/`)

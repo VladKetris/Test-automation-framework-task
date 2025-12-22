@@ -25,6 +25,7 @@
 14. **🔴 JSDoc on all methods** - All public methods in Page Objects must have JSDoc comments describing what they do. Use concise, action-oriented descriptions.
 15. **🔴 Page Object-specific constants** - Constants specific to a Page Object (like page titles, specific text values) must be stored as constants at the top of the Page Object file. Use UPPER_SNAKE_CASE naming.
 16. **🔴 Locator extraction process** - Follow [locators.md](locators.md) methodology for creating new locators. Always verify uniqueness before implementation.
+17. **🔴 Dynamic locators as arrow functions** - For parameterized locators (by index, text, etc.), use arrow function class properties instead of inline creation in methods.
 
 ---
 
@@ -210,16 +211,11 @@ Same page → extend existing | Similar page → inheritance | Different page �
 
 ```typescript
 import { Page, Locator } from "@playwright/test";
-import { BasePage } from "./BasePage";
+import { BasePage } from "@pages/BasePage";
 
 export class PageName extends BasePage {
-    /**
-     * Page description.
-     * URL: https://example.com/page
-     */
-
-    readonly submitButton: Locator;
-    readonly messageLabel: Locator;
+    private readonly submitButton: Locator;
+    private readonly messageLabel: Locator;
 
     constructor(page: Page) {
         super(page, page.locator("#unique-container"), "Page Name");
@@ -242,8 +238,58 @@ export class PageName extends BasePage {
      */
     async getMessageText(): Promise<string> {
         await this.elementToBeVisible(this.messageLabel);
-        return await this.messageLabel.textContent() || "";
+        const text = await this.messageLabel.textContent();
+        return text || "";
     }
+}
+```
+
+---
+
+## Dynamic Locators
+
+For locators that depend on parameters (index, text, ID), use **arrow function class properties**:
+
+```typescript
+export class TablePage extends BasePage {
+    private readonly rows: Locator;
+    
+    // ✅ Arrow functions for parameterized locators
+    private readonly getRow = (index: number): Locator => 
+        this.rows.nth(index);
+    
+    private readonly getCell = (row: number, col: number): Locator => 
+        this.getRow(row).locator('td').nth(col);
+    
+    private readonly getRowByText = (text: string): Locator => 
+        this.rows.filter({ hasText: text });
+
+    constructor(page: Page) {
+        super(page, page.locator('table'), 'TablePage');
+        this.rows = page.locator('tbody tr').describe('Table rows');
+    }
+
+    /**
+     * Click specific cell
+     */
+    async clickCell(row: number, col: number): Promise<void> {
+        await this.getCell(row, col).click();
+    }
+}
+```
+
+**Why arrow functions?**
+- Locators stay centralized in class properties
+- Reusable across multiple methods
+- Easy to compose (e.g., `getCell` uses `getRow`)
+- Consistent with static locator pattern
+
+**❌ Avoid inline locator creation:**
+```typescript
+// BAD: Creating locator inline in method
+async clickCell(row: number, col: number): Promise<void> {
+    const cell = this.rows.nth(row).locator('td').nth(col);
+    await cell.click();
 }
 ```
 
@@ -256,6 +302,7 @@ export class PageName extends BasePage {
 -   ✅ Reuses existing locators and keeps them centralized in Page Objects
 -   ✅ Playwright `Locator` used for all elements
 -   ✅ All locators have `.describe()` for debugging
+-   ✅ Dynamic locators use arrow function class properties
 -   ✅ BasePage check methods used for validations
 -   ✅ Atomic public API
 -   ✅ No duplicate functionality

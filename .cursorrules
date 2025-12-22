@@ -57,6 +57,7 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full coding rules.
 ### Page Objects
 - Inherit from `BasePage`
 - Use `.describe()` on ALL locators
+- Use arrow function class properties for dynamic/parameterized locators
 - `navigate()` method for page URLs (from environment config)
 - Atomic actions only (click/fill/get)
 - **🔴 Never override `verifyPageOpened()`** (use `super` implementation)
@@ -138,6 +139,7 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full list.
 - ❌ Unused imports in any file
 - ❌ Relative imports when path alias exists (use `@utils/config` not `../../utils/config`)
 - ❌ Missing barrel exports for new modules (add to `index.ts`)
+- ❌ Inline locator creation in methods (use arrow function class properties for dynamic locators)
 
 ## After Creating Code
 

@@ -7,25 +7,33 @@
 
 Build robust tests without duplication. Spec files are input - all implementation follows from test scenarios.
 
+---
+
 ## Core Steps
 
 ### 1. Spec Definition (AI Input)
 - **Format**: Gherkin (Given/When/Then)
-- **Purpose**: Use as a prompt for the AI Agent.
-- **Storage**: Ephemeral / Reference only. Do NOT commit `.feature` files to the repository.
-- **Process**: Paste the Gherkin scenario into the chat with the AI.
+- **Purpose**: Use as a prompt for the AI Agent
+- **Storage**: Ephemeral / Reference only. Do NOT commit `.feature` files to the repository
+- **Process**: Paste the Gherkin scenario into the chat with the AI
 
 ### 2. Locator Strategy (Reuse First)
 
 **Before writing any code:**
 
-1. **SEARCH EXISTING**: Check `docs/maps/page-object-map.md` and search the codebase.
+1. **SEARCH EXISTING**: Check `docs/maps/page-object-map.md` and search the codebase
    - If the Page Object and locator already exist → **use them**
    - If the Page Object exists but a method is missing → **extend the existing Page Object**
 
-2. Prefer using existing locators and methods from existing Page Objects.
+2. **NEW LOCATORS**: Follow [locators.md](patterns/locators.md) methodology
+   - Use MCP for visual analysis
+   - Verify uniqueness before implementation
+   - Always add `.describe()` to locators
+
+3. Prefer using existing locators and methods from existing Page Objects
 
 ### 3. 🔴 MANDATORY: Check Maps Before Coding
+
 **STOP! Before writing ANY code:**
 1. **OPEN** `docs/maps/page-object-map.md` - Check existing Page Objects
 2. **OPEN** `docs/maps/steps-map.md` - Check existing Steps classes
@@ -38,11 +46,16 @@ Build robust tests without duplication. Spec files are input - all implementatio
 **Reference:** `.cursorrules` is the authoritative source for all coding rules and structure.
 
 **Documentation:**
-- **Page Objects**: see `docs/patterns/page-object.md`
-- **Steps**: see `docs/patterns/step-definition.md`
-- **API utilities**: see `docs/patterns/api-utils.md`
-- **Special cases**: see `docs/examples/special-cases.md`
-- **Coding standards**: see `docs/coding-standards.md`
+| Pattern | Document |
+|---------|----------|
+| Page Objects | [patterns/page-object.md](patterns/page-object.md) |
+| Steps | [patterns/step-definition.md](patterns/step-definition.md) |
+| Locators | [patterns/locators.md](patterns/locators.md) |
+| API utilities | [patterns/api-utils.md](patterns/api-utils.md) |
+| Test data | [patterns/test-data-management.md](patterns/test-data-management.md) |
+| Elements | [patterns/elements.md](patterns/elements.md) |
+| Special cases | [examples/special-cases.md](examples/special-cases.md) |
+| Coding standards | [coding-standards.md](coding-standards.md) |
 
 ### 5. Tests (thin orchestration)
 
@@ -53,11 +66,10 @@ Tests can use **both** Page Objects and Steps:
 Choose based on intent, not line count. Keep test-specific constants inside the test body.
 
 **Preconditions (Shared Setup)**
-- Use `test.beforeEach(...)` for **common preconditions** shared by all tests in a `test.describe(...)` block (e.g., “log in as user X”, “open main page”, “seed data via API Steps”).
-- `beforeEach` can use both Steps and Page Objects (same flexibility as tests).
-- Keep test-specific data/constants **inside the test** unless it truly applies to every test in the file.
-- Avoid assertions that are specific to only one scenario in `beforeEach`. Limit `beforeEach` to setup + minimal “ready” verification.
-- Prefer **API Steps** for setup/teardown when possible (faster and more reliable than UI).
+- Use `test.beforeEach(...)` for **common preconditions** shared by all tests in a `test.describe(...)` block
+- `beforeEach` can use both Steps and Page Objects (same flexibility as tests)
+- Keep test-specific data/constants **inside the test** unless it truly applies to every test
+- Prefer **API Steps** for setup/teardown when possible (faster and more reliable than UI)
 
 **Assertions (URL)**
 - 🔴 **Never assert URLs** in tests/steps/page objects. Use page-level UI signals (heading/content/title) instead.
@@ -77,6 +89,7 @@ pnpm typecheck && pnpm lint && pnpm test
 ```
 
 ### 7. Code Submission
+
 1. **Create feature branch** from current branch
 2. **Verify all tests pass** (100% required)
 3. **Stage changes** (git add) - **Only `.ts` files (tests, pages, steps)**. Do NOT add `.feature` files.
@@ -84,8 +97,6 @@ pnpm typecheck && pnpm lint && pnpm test
 5. **Push branch** to remote
 6. **Create Pull Request**
 7. **Result**: Open PR (NOT merged!)
-
-**Tip:** Use your standard Git workflow (branch → commit → push → PR) when you need to submit code.
 
 ### 8. API Steps (When Needed)
 
@@ -98,49 +109,85 @@ Use API Steps for test data setup/teardown (faster than UI interactions).
 **Components**:
 | File | Purpose |
 |------|---------|
-| `utils/ApiClient.ts` | Generic HTTP wrapper (GET/POST/PUT/DELETE) |
+| `utils/api-client.ts` | Generic HTTP wrapper (GET/POST/PUT/DELETE) |
 | `tests/api-steps/*ApiSteps.ts` | Domain-specific API methods |
 
 **Example API Steps:**
 ```typescript
 import { step } from '@utils/decorators';
+import { ApiClient } from '@utils/api-client';
 
 export class UserApiSteps {
+    constructor(private readonly apiClient: ApiClient) {}
+
+    /**
+     * Create user via API
+     */
     @step('Create user via API: {0}')
     async createUser(name: string, email: string): Promise<User> {
-        const response = await this.apiClient.post<User>('/users', { name, email });
-        return response.body;
+        const response = await this.apiClient.post('/users', { 
+            data: { name, email } 
+        });
+        return response.json();
+    }
+
+    /**
+     * Delete user via API
+     */
+    @step('Delete user via API: {0}')
+    async deleteUser(userId: string): Promise<void> {
+        await this.apiClient.delete(`/users/${userId}`);
     }
 }
 ```
 
 **Usage Pattern (API + UI mixed):**
 ```typescript
-import { test } from '@fixtures/api.fixture';
+import { test } from '@fixtures';
 
-test('edit user profile', async ({ userApiSteps, wikiSteps }) => {
-    const user = await userApiSteps.createUser('John', 'john@test.com'); // Fast API setup
-    await wikiSteps.navigateToProfile(user.id);                         // UI test
-    await userApiSteps.deleteUser(user.id);                             // Fast API cleanup
+test('Edit user profile', async ({ userApiSteps, profilePage }) => {
+    const user = await userApiSteps.createUser('John', 'john@test.com');
+    await profilePage.navigate(user.id);
+    await profilePage.verifyUserName('John');
+    await userApiSteps.deleteUser(user.id);
 });
 ```
 
 **See [patterns/api-utils.md](patterns/api-utils.md) for complete API patterns.**
 
+---
+
 ## Directory Structure
+
 ```
 tests/
-├── pages/       ← Page Objects (reuse first!)
-├── steps/       ← UI Steps Classes (@step decorators)
-├── api-steps/   ← API Steps Classes (@step decorators)
-├── fixtures/    ← Test Fixtures (steps.fixture.ts, api.fixture.ts)
-└── specs/       ← Spec files (Test Scenarios)
+├── api/                 ← API Layer
+│   ├── builders/        ← Request Builders
+│   ├── constants/       ← StatusCode, Headers, ContentType
+│   ├── routes/          ← Endpoint definitions
+│   ├── schemas/         ← Zod Schemas
+│   └── services/        ← API Services
+├── pages/               ← Page Objects (reuse first!)
+├── steps/               ← UI Steps Classes (@step decorators)
+├── api-steps/           ← API Steps Classes (@step decorators)
+├── fixtures/            ← Test Fixtures (steps.fixture.ts, api.fixture.ts)
+├── data/                ← Test data (environment/, wikipedia/)
+└── specs/               ← Spec files (Test Scenarios)
+
 utils/
-├── ApiClient.ts ← HTTP wrapper
+├── api-client.ts        ← HTTP wrapper
+├── config.ts            ← Environment configuration
+├── decorators.ts        ← @step decorator
+├── secrets.ts           ← Credentials from env vars
+├── test-data-generator.ts ← Random data (Faker.js)
+├── test-data-provider.ts  ← Static data from JSON
 └── ...
 ```
 
+---
+
 ## Success Criteria
+
 - ✅ Tests execute 100% successfully
 - ✅ TypeScript compiles without errors (`pnpm typecheck`)
 - ✅ ESLint passes without errors (`pnpm lint`)

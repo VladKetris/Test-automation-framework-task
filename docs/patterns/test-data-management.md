@@ -375,13 +375,14 @@ Custom Playwright assertions for API testing.
 ```typescript
 import { expect } from '@playwright/test';
 import { matchers } from '@utils/matchers';
+import { StatusCode } from '@api';
 
 // Extend expect with custom matchers
 expect.extend(matchers);
 
 // Use in tests
 const response = await client.get('/users');
-await expect(response).toHaveStatusCode(200);
+await expect(response).toHaveStatusCode(StatusCode.OK);
 ```
 
 ### Available Matchers

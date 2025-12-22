@@ -19,13 +19,15 @@ Step classes receive Page Objects via **constructor injection from fixtures**, e
 // tests/steps/WikipediaLoginSteps.ts
 
 export class WikipediaLoginSteps {
-    // ✅ Receive Page Object via constructor injection (from fixtures)
     constructor(
-        readonly loginPage: WikipediaLoginPage
-    ) { }
+        private readonly loginPage: WikipediaLoginPage
+    ) {}
 
-    @step('Login with valid credentials')
-    async loginValid(username: string, password: string): Promise<void> {
+    /**
+     * Perform login with credentials
+     */
+    @step('Login with "{0}"')
+    async login(username: string, password: string): Promise<void> {
         await this.loginPage.enterUsername(username);
         await this.loginPage.enterPassword(password);
         await this.loginPage.clickLogin();
@@ -40,17 +42,22 @@ import { WikipediaLoginPage } from '@pages/WikipediaLoginPage';
 import { step } from '@utils/decorators';
 
 export class WikipediaLoginSteps {
-    // 1. Dependency Injection - receive Page Objects from fixtures
-    constructor(readonly loginPage: WikipediaLoginPage) { }
+    constructor(
+        private readonly loginPage: WikipediaLoginPage
+    ) {}
 
-    // 2. Step implementation with @step decorator
+    /**
+     * Verify login page is displayed
+     */
     @step('Verify Login page is opened')
     async verifyPageOpened(): Promise<void> {
         await this.loginPage.verifyPageOpened();
         await this.loginPage.verifyLoginPageTitle();
     }
     
-    // 3. Complex logic using atomic PO methods
+    /**
+     * Perform login with credentials
+     */
     @step('Login to Wikipedia with "{0}"')
     async login(username: string, password: string): Promise<void> {
         await this.loginPage.enterUsername(username);
@@ -80,11 +87,13 @@ export const test = apiTest.extend<StepsFixtures>({
 
 | Rule | Reason |
 |------|--------|
-| ✅ Receive PO via constructor | DRY: Single instance per test |
-| ✅ Use `@step` decorator | Clear reporting in HTML report |
-| ✅ Use parameters | Reusability (e.g., `enterCredentials(user, pass)`) |
+| ✅ `private readonly` for PO | Proper encapsulation |
+| ✅ `@step` decorator on ALL methods | Clear reporting in HTML report |
+| ✅ JSDoc on ALL methods | Documentation standard |
+| ✅ Accept data as parameters | Reusability across scenarios |
 | ❌ No locators in Steps | Maintainability (keep in PO) |
 | ❌ No `new PageObject()` | Violation of DI pattern |
+| ❌ No hardcoded data | Flexibility for different test cases |
 
 ---
 

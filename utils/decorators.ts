@@ -27,7 +27,7 @@ export function step(stepName?: string) {
             return test.step(
                 name,
                 async () => {
-                    return await target.call(this, ...args);
+                    return target.call(this, ...args);
                 },
                 { box: true }
             );
