@@ -15,6 +15,7 @@ See [docs/tech-stack.md](docs/tech-stack.md) for architecture overview.
    - Use locators/methods from existing Page Objects
    - Prefer extending existing Page Objects with existing locator patterns already in the project
    - Avoid creating new locators unless explicitly requested
+   - Follow [docs/patterns/locators.md](docs/patterns/locators.md) for locator extraction methodology
 
 ## Architecture
 
@@ -85,8 +86,10 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full coding rules.
 - **API Services**: Return raw `APIResponse` (never parsed JSON)
 - **API Routes**: Use route constants, never hardcode endpoints
 - **Schemas**: Validate all responses with Zod schemas (status → schema → business logic)
+- **Always use `assertSchema()`** - Never bypass validation with `response.json()`, always use `assertSchema(response, Schema, 'Description')`
 - **Test Data**: Ensure all test data exists and is valid (see test-data-management.md)
 - **Endpoints**: Verify endpoints exist before writing tests, remove tests for non-existent endpoints
+- **No duplicate tests** - Each test must be unique; do not create tests with identical assertions
 - See [docs/patterns/api-utils.md](docs/patterns/api-utils.md) for API utilities and validation patterns
 
 ### API Steps
@@ -107,6 +110,9 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full coding rules.
   - `@data/*` → `tests/data/*`
 - Import from barrel exports (index.ts): `import { X } from '@pages'` (not `@pages/X`)
 - Import specific files: `import { X } from '@pages/WikipediaLoginPage'`
+- **All modules must be exported from barrel files** - Every new service, page, step class must be added to its `index.ts`
+- **No unused imports** - Remove all unused imports immediately
+- **No relative imports when alias exists** - Use `@utils/config` not `../../utils/config`
 
 ## Anti-Patterns (NEVER DO)
 
@@ -127,12 +133,18 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full list.
 - ❌ Missing schema validation in API tests
 - ❌ Hardcoded unique identifiers or non-existent values (use random data generation)
 - ❌ Explanatory comments in tests (`// Steps:`, `// PO:`, `// Zod validates:`) - code should be self-documenting
+- ❌ Bypassing schema validation with `response.json()` - always use `assertSchema()`
+- ❌ Duplicate tests with identical assertions
+- ❌ Unused imports in any file
+- ❌ Relative imports when path alias exists (use `@utils/config` not `../../utils/config`)
+- ❌ Missing barrel exports for new modules (add to `index.ts`)
 
 ## After Creating Code
 
 - Update [docs/maps/page-object-map.md](docs/maps/page-object-map.md) with new Page Objects
 - Update [docs/maps/steps-map.md](docs/maps/steps-map.md) with new Steps classes
 - Run `pnpm typecheck` to verify TypeScript types
+- Run `pnpm lint` to verify code quality (ESLint)
 - Run `pnpm test` to verify behavior
 - See [docs/reporting.md](docs/reporting.md) for test reports
 
@@ -147,6 +159,7 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full list.
 - [docs/patterns/step-definition.md](docs/patterns/step-definition.md) - Steps pattern
 - [docs/patterns/api-utils.md](docs/patterns/api-utils.md) - API utilities, validation patterns, endpoint validation
 - [docs/patterns/elements.md](docs/patterns/elements.md) - Element handling
+- [docs/patterns/locators.md](docs/patterns/locators.md) - Locator extraction methodology
 - [docs/patterns/test-data-management.md](docs/patterns/test-data-management.md) - Test data (including JSON validation rules)
 - [docs/patterns/feature-input.md](docs/patterns/feature-input.md) - Gherkin input
 
@@ -157,6 +170,7 @@ See [docs/coding-standards.md](docs/coding-standards.md) for full list.
 - [docs/examples/special-cases.md](docs/examples/special-cases.md) - Tables, iframes, alerts
 - [docs/examples/test-data-example.md](docs/examples/test-data-example.md) - Test data
 - [docs/examples/reporting-example.md](docs/examples/reporting-example.md) - Reporting
+- [docs/examples/locator-extraction-example.md](docs/examples/locator-extraction-example.md) - Locator extraction
 
 ### Standards
 - [docs/coding-standards.md](docs/coding-standards.md) - Coding rules

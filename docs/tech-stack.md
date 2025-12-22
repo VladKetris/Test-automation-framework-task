@@ -6,6 +6,7 @@
 - **Playwright Test Runner** - Native test runner
 - **Playwright HTML Reporter** - Built-in reporting
 - **Zod** - Runtime schema validation for API responses
+- **ESLint 9** - Code quality and linting with TypeScript and Playwright plugins
 - **Path Aliases** - TypeScript path mapping for clean imports (`@pages`, `@steps`, `@api`, `@fixtures`, `@utils`, `@data`)
 
 ## Framework Components
@@ -14,7 +15,34 @@
 - **API Layer** - API services, routes, schemas (see `tests/api/`)
 - **Fixtures** - Dependency injection for tests (see `tests/fixtures/`)
 - **BasePage Check Methods** - Centralized element state validation
+- **Locator Extraction** - MCP-based locator methodology (see [patterns/locators.md](patterns/locators.md))
 - **HTML Reports** - Comprehensive reporting with screenshots, traces, and videos
+
+## Code Quality Tools
+
+### ESLint Configuration
+
+The framework uses ESLint 9 with flat config for code quality enforcement.
+
+**Plugins:**
+- `@typescript-eslint` - TypeScript-specific rules
+- `eslint-plugin-playwright` - Playwright best practices
+
+**Key Rules:**
+| Rule | Description |
+|------|-------------|
+| `no-unused-vars` | Detect unused variables/imports |
+| `no-floating-promises` | Require awaiting promises |
+| `no-wait-for-timeout` | Prevent `page.waitForTimeout()` |
+| `no-page-pause` | Prevent `page.pause()` in code |
+
+**Commands:**
+```bash
+pnpm lint          # Check for issues
+pnpm lint:fix      # Auto-fix issues
+```
+
+**Configuration:** `eslint.config.js` (ES module format)
 
 ## Directory Structure
 ```
@@ -89,6 +117,7 @@ The framework uses TypeScript path aliases for clean, maintainable imports. All 
 | `@pages/*` | `tests/pages/*` | Specific Page Object files |
 | `@steps` | `tests/steps` | Steps classes (barrel export) |
 | `@steps/*` | `tests/steps/*` | Specific Steps files |
+| `@api` | `tests/api` | API layer (barrel export) |
 | `@api/*` | `tests/api/*` | API services, routes, schemas, builders |
 | `@fixtures` | `tests/fixtures` | Test fixtures (barrel export) |
 | `@fixtures/*` | `tests/fixtures/*` | Specific fixture files |
@@ -128,6 +157,7 @@ Path aliases are configured in `tsconfig.json`:
       "@pages/*": ["tests/pages/*"],
       "@steps": ["tests/steps"],
       "@steps/*": ["tests/steps/*"],
+      "@api": ["tests/api"],
       "@api/*": ["tests/api/*"],
       "@fixtures": ["tests/fixtures"],
       "@fixtures/*": ["tests/fixtures/*"],

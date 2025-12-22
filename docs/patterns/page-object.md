@@ -3,6 +3,7 @@
 **Location:** `tests/pages/` directory
 
 **📘 Full Example:** [page-object-example.md](../examples/page-object-example.md)
+**📘 Locator Extraction:** [locators.md](locators.md)
 
 ---
 
@@ -10,7 +11,7 @@
 
 1.  **🔴 CHECK [page-object-map.md](../maps/page-object-map.md) FIRST** - Never create without checking
 2.  **Inherit from `BasePage`**
-3.  **ONE locator per element** - Most reliable verified locator only
+3.  **ONE locator per element** - Most reliable verified locator only (see [locators.md](locators.md))
 4.  **Locator reuse** - Prefer existing locators and extend existing Page Objects when needed
 5.  **Direct Playwright API** - Use `Locator` for elements, BasePage methods for checks, `.describe()` for debugging
 6.  **Atomic Actions** - Expose simple actions (click, type, get text), NOT complex business logic
@@ -23,6 +24,7 @@
 13. **🔴 Expect assertions in BasePage** - Any verification using Playwright expect matchers (like `toHaveTitle`, `toBeVisible`, `toHaveText`, etc.) must be added to `BasePage` as a generic method. Page Objects should call the BasePage method, not use `expect()` directly.
 14. **🔴 JSDoc on all methods** - All public methods in Page Objects must have JSDoc comments describing what they do. Use concise, action-oriented descriptions.
 15. **🔴 Page Object-specific constants** - Constants specific to a Page Object (like page titles, specific text values) must be stored as constants at the top of the Page Object file. Use UPPER_SNAKE_CASE naming.
+16. **🔴 Locator extraction process** - Follow [locators.md](locators.md) methodology for creating new locators. Always verify uniqueness before implementation.
 
 ---
 

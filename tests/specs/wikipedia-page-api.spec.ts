@@ -2,7 +2,7 @@ import { test } from '@fixtures/api.fixture';
 import { expect } from '@playwright/test';
 import { StatusCode } from '@api/constants';
 import { assertSchema } from '@utils/parse-response';
-import { PageBareWithTitleSchema } from '@api/schemas';
+import { PageBareWithTitleSchema, AccessTokenSchema } from '@api/schemas';
 import { getRandomArticle, getAllArticles } from '@utils/test-data-provider';
 import { randomString } from '@utils/test-data-generator';
 
@@ -33,7 +33,7 @@ test.describe('Wikipedia Page API Tests', () => {
         const authResponse = await authService.getMetaUserAccessToken();
         await expect(authResponse).toHaveStatusCode(StatusCode.OK);
         
-        const authData = await authResponse.json();
+        const authData = await assertSchema(authResponse, AccessTokenSchema, 'Access Token Response');
         const accessToken = authData.access_token;
 
         const response = await pageService.getBarePage(PAGE_TITLE, accessToken);

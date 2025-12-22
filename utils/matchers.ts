@@ -1,4 +1,4 @@
-import { expect as baseExpect, APIResponse } from '@playwright/test';
+import { APIResponse } from '@playwright/test';
 
 export const matchers = {
     async toHaveStatusCode(response: APIResponse, expectedCode: number) {

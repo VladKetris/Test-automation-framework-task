@@ -65,9 +65,15 @@ Choose based on intent, not line count. Keep test-specific constants inside the 
 ### 6. Validation (runbook)
 
 ```bash
-pnpm typecheck
-pnpm test
+pnpm typecheck       # TypeScript type checking
+pnpm lint            # ESLint code quality
+pnpm test            # Run tests
 pnpm exec playwright show-report
+```
+
+**Quick validation before commit:**
+```bash
+pnpm typecheck && pnpm lint && pnpm test
 ```
 
 ### 7. Code Submission
@@ -136,6 +142,8 @@ utils/
 
 ## Success Criteria
 - ✅ Tests execute 100% successfully
+- ✅ TypeScript compiles without errors (`pnpm typecheck`)
+- ✅ ESLint passes without errors (`pnpm lint`)
 - ✅ Maps updated after creating code
 - ✅ All coding rules followed (see `.cursorrules` and `docs/coding-standards.md`)
 

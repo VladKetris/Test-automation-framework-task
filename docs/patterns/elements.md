@@ -3,6 +3,7 @@
 This document describes how to work with page elements in the framework using Playwright's Locator API directly, combined with centralized check methods from `BasePage`.
 
 **📘 Usage Example:** [page-object-example.md](../examples/page-object-example.md)
+**📘 Locator Extraction:** [locators.md](locators.md) | [locator-extraction-example.md](../examples/locator-extraction-example.md)
 
 ---
 
@@ -112,7 +113,7 @@ export class LoginPage extends BasePage {
 
 ### Locator Patterns
 
-The framework supports multiple locator strategies:
+The framework supports multiple locator strategies. See [locators.md](locators.md) for full extraction methodology and priority order:
 
 #### CSS Selectors
 ```typescript

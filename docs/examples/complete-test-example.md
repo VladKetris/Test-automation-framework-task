@@ -1,5 +1,7 @@
 # Complete Test Example
 
+> ⚠️ **ILLUSTRATIVE ONLY**: The classes shown below (`WikipediaCreateAccountPage`, `WikipediaCreateAccountSteps`, `WikipediaGetStartedPopupPage`, `WikipediaLandingSteps`) are **examples for demonstration purposes** and may not exist in the actual codebase. Use this as a pattern reference, not code to copy.
+
 This example demonstrates a full test implementation using:
 1.  **Page Objects** (Atomic actions)
 2.  **Steps Classes** (Business logic with composite methods)

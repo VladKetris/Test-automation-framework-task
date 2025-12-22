@@ -15,14 +15,6 @@ test.describe('Wikipedia Auth API Tests', () => {
         await assertSchema(response, AccessTokenSchema, 'Access Token Response');
     });
 
-    test('Verify access token response structure', async ({ authService }) => {
-        const response = await authService.getMetaUserAccessToken();
-
-        await expect(response).toHaveStatusCode(StatusCode.OK);
-
-        await assertSchema(response, AccessTokenSchema, 'Access Token Response');
-    });
-
     test('Verify access token can be used for authenticated requests', async ({ authService, pageService }) => {
         const TEST_PAGE_TITLE = getRandomArticle();
         

@@ -1,4 +1,4 @@
-import { APIResponse } from '@playwright/test';
+import type { APIResponse } from '@playwright/test';
 
 declare global {
     namespace PlaywrightTest {
@@ -7,3 +7,5 @@ declare global {
         }
     }
 }
+
+export {};

@@ -28,7 +28,7 @@ pnpm exec playwright install
 
 ```bash
 # Run all tests
-npx playwright test
+pnpm test
 
 # Run specific test file
 npx playwright test tests/example.spec.ts
@@ -44,6 +44,22 @@ npx playwright test --ui
 
 # View Report
 npx playwright show-report
+```
+
+### Code Quality
+
+```bash
+# TypeScript type checking
+pnpm typecheck
+
+# ESLint code quality check
+pnpm lint
+
+# Auto-fix ESLint issues
+pnpm lint:fix
+
+# Run all checks
+pnpm typecheck && pnpm lint
 ```
 
 ## Environment Configuration
@@ -159,19 +175,21 @@ Playwright-SDD/
 
 1.  **Spec Definition**: Define scenarios in Gherkin format (Given/When/Then) to use as a prompt for the AI.
 2.  **AI Generation**: The AI Agent converts the Gherkin spec into executable Playwright code.
-3.  **Locator Reuse**: Prefer existing Page Objects and existing locators/methods.
-4.  **Page Objects**: AI creates/reuses Page Objects in `tests/pages/` (checking `page-object-map.md`).
-5.  **Step Implementation**: AI implements logic in `tests/steps/` or directly in tests using Page Objects.
-6.  **Validation**: Run tests to ensure they pass.
+3.  **Locator Reuse**: Prefer existing Page Objects and existing locators/methods (check `page-object-map.md`).
+4.  **Locator Extraction**: For new elements, use [MCP-based methodology](docs/patterns/locators.md) with visual analysis.
+5.  **Page Objects**: AI creates/reuses Page Objects in `tests/pages/` with verified, unique locators.
+6.  **Step Implementation**: AI implements logic in `tests/steps/` or directly in tests using Page Objects.
+7.  **Validation**: Run `pnpm typecheck && pnpm lint && pnpm test` to ensure quality.
 
 ## Key Features
 
 -   **TypeScript**: Type-safe, modern implementation with path aliases (`@pages`, `@steps`, `@api`, `@fixtures`, `@utils`, `@data`)
--   **Playwright Test Runner**: Fast, reliable, parallel execution.
--   **Page Object Model**: Maintainable UI abstraction.
--   **Element Wrappers**: Built-in logging and smart waits.
--   **Spec Driven**: Tests derived from business specifications.
--   **Reusable Components**: DRY principle enforcement.
+-   **Playwright Test Runner**: Fast, reliable, parallel execution
+-   **Page Object Model**: Maintainable UI abstraction with BasePage checks
+-   **MCP-Based Locators**: Visual analysis and verification via Playwright MCP
+-   **Spec Driven**: Tests derived from business specifications (Gherkin → AI → Code)
+-   **ESLint Integration**: TypeScript and Playwright-specific linting rules
+-   **Reusable Components**: DRY principle enforcement with centralized maps
 
 ## Documentation
 
@@ -183,11 +201,13 @@ Playwright-SDD/
 4.  **[Tech Stack](docs/tech-stack.md)** - Technologies used
 
 ### Patterns (Rules)
+-   **[Locators](docs/patterns/locators.md)** - Locator extraction methodology (MCP-based)
 -   **[Page Objects](docs/patterns/page-object.md)** - Page Object rules
 -   **[Step Definitions](docs/patterns/step-definition.md)** - Step rules
 -   **[Elements](docs/patterns/elements.md)** - Framework elements
 
 ### Examples
+-   **[Locator Extraction](docs/examples/locator-extraction-example.md)** - Wikipedia Login Page example
 -   **[Page Object](docs/examples/page-object-example.md)**
 
 ## Best Practices
@@ -195,14 +215,16 @@ Playwright-SDD/
 ### ✅ Do's
 -   **Check maps/page-object-map.md BEFORE creating any code**
 -   Reuse existing Page Objects/locators before adding anything new
+-   Follow [locator extraction methodology](docs/patterns/locators.md) for new locators
+-   Verify locator uniqueness via MCP before implementation
+-   Always add `.describe()` to locators for debugging
 -   Create one Page Object per unique page/URL
--   Reuse existing Page Objects and steps
--   Use framework element wrappers
 -   **Update maps/page-object-map.md AFTER creating new code**
 
 ### ❌ Don'ts
--   Write code without locator validation
--   Create duplicate Page Objects
+-   Create locators without uniqueness verification
+-   Create duplicate Page Objects or locators
+-   Skip `.describe()` on locators
 -   Use direct Playwright calls in tests (use Page Objects)
 -   Hard-code test data in code
 -   Use `page.waitForTimeout()` (manual sleep)

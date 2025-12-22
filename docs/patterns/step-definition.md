@@ -13,21 +13,22 @@ The layer where Gherkin steps are mapped to Playwright code.
 
 ## Dependency Injection
 
-Step classes receive Page Objects via constructor injection, ensuring the "Single Page Object Instance" rule (DRY).
+Step classes receive Page Objects via **constructor injection from fixtures**, ensuring the "Single Page Object Instance" rule (DRY).
 
 ```typescript
 // tests/steps/WikipediaLoginSteps.ts
 
 export class WikipediaLoginSteps {
-    // Receive Page Object in constructor
+    // ✅ Receive Page Object via constructor injection (from fixtures)
     constructor(
         readonly loginPage: WikipediaLoginPage
-    ) {}
+    ) { }
 
     @step('Login with valid credentials')
-    async loginValid(): Promise<void> {
-        await this.loginPage.navigate();
-        // ...
+    async loginValid(username: string, password: string): Promise<void> {
+        await this.loginPage.enterUsername(username);
+        await this.loginPage.enterPassword(password);
+        await this.loginPage.clickLogin();
     }
 }
 ```
@@ -39,13 +40,14 @@ import { WikipediaLoginPage } from '@pages/WikipediaLoginPage';
 import { step } from '@utils/decorators';
 
 export class WikipediaLoginSteps {
-    // 1. Dependency Injection
-    constructor(readonly loginPage: WikipediaLoginPage) {}
+    // 1. Dependency Injection - receive Page Objects from fixtures
+    constructor(readonly loginPage: WikipediaLoginPage) { }
 
     // 2. Step implementation with @step decorator
     @step('Verify Login page is opened')
     async verifyPageOpened(): Promise<void> {
         await this.loginPage.verifyPageOpened();
+        await this.loginPage.verifyLoginPageTitle();
     }
     
     // 3. Complex logic using atomic PO methods

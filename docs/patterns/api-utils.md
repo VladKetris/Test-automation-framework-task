@@ -128,6 +128,7 @@ Domain-specific logic.
 1.  **Return Raw `APIResponse`**: Never return parsed JSON. Allow tests to access headers/status.
 2.  **No Assertions**: Services should only fetch data. Validation happens in tests.
 3.  **Use Routes**: Use `tests/api/routes` for endpoints.
+4.  **Export from Barrel**: All services must be exported from `tests/api/services/index.ts`.
 
 ```typescript
 // tests/api/services/UserService.ts
@@ -152,9 +153,11 @@ export class UserService {
  
  Validation happens at the test level using the `assertSchema` helper, which parses the response and handles assertions automatically.
  
+ **🔴 CRITICAL RULE:** Always use `assertSchema()` - never bypass with `response.json()`
+ 
  **Validation Flow (always follow this order):**
  1. **Status Code Validation** (always first)
- 2. **Schema Validation** (structure and types)
+ 2. **Schema Validation** (structure and types) - **Always use `assertSchema()`**
  3. **Business Logic Validation** (specific assertions)
  
  ```typescript
@@ -169,12 +172,26 @@ export class UserService {
      // 2. Validate status code (always first)
      await expect(response).toHaveStatusCode(StatusCode.CREATED);
  
-     // 3. Validate schema (structure and types)
+     // 3. Validate schema (structure and types) - ALWAYS use assertSchema!
      const data = await assertSchema(response, UserSchema, 'User Creation Response');
      
      // 4. Verify business logic (specific assertions)
      expect(data.name, 'Created user name should match input').toBe('John');
  });
+ ```
+
+ **❌ WRONG: Bypassing schema validation**
+ ```typescript
+ // DON'T DO THIS - bypasses validation
+ const authResponse = await authService.getAccessToken();
+ const authData = await authResponse.json();  // NO! No type safety, no validation
+ ```
+
+ **✅ CORRECT: Using assertSchema**
+ ```typescript
+ // ALWAYS DO THIS
+ const authResponse = await authService.getAccessToken();
+ const authData = await assertSchema(authResponse, AccessTokenSchema, 'Access Token');
  ```
 
 ### 5. Assertion Rules

@@ -22,6 +22,7 @@
             "@pages/*": ["tests/pages/*"],
             "@steps": ["tests/steps"],
             "@steps/*": ["tests/steps/*"],
+            "@api": ["tests/api"],
             "@api/*": ["tests/api/*"],
             "@fixtures": ["tests/fixtures"],
             "@fixtures/*": ["tests/fixtures/*"],

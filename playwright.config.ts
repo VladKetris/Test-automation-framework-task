@@ -43,6 +43,7 @@ export default defineConfig({
       testDir: './tests/specs',
       use: {
         ...devices['Desktop Chrome'],
+        headless: !!process.env.CI,
       }
     },
   ],

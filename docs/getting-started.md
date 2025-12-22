@@ -38,6 +38,9 @@ pnpm exec playwright install
 # Check TypeScript compilation
 pnpm typecheck
 
+# Check code quality (ESLint)
+pnpm lint
+
 # Run a sample test (if available)
 pnpm test
 ```
@@ -112,6 +115,7 @@ Playwright-SDD/
 │   └── api-client.ts         # API client wrapper
 │
 ├── playwright.config.ts      # Playwright configuration
+├── eslint.config.js          # ESLint configuration
 ├── tsconfig.json             # TypeScript configuration
 └── package.json              # Dependencies
 ```
@@ -290,6 +294,21 @@ See [API Utilities Pattern](patterns/api-utils.md) for details.
 # Check for type errors
 pnpm typecheck
 ```
+
+### ESLint Errors
+
+```bash
+# Check for linting errors
+pnpm lint
+
+# Auto-fix linting errors
+pnpm lint:fix
+```
+
+**Common ESLint issues:**
+- **Unused imports** - Remove or prefix with `_`
+- **Missing await** - Add `await` to async calls
+- **Relative imports** - Use path aliases (`@pages`, `@utils`, etc.)
 
 ### Tests Not Finding Fixtures
 

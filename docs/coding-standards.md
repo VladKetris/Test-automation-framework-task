@@ -4,6 +4,41 @@ TypeScript code style and naming conventions for the framework.
 
 ---
 
+## ESLint
+
+The project uses ESLint with TypeScript and Playwright plugins for code quality.
+
+### Running Linter
+
+```bash
+# Check for issues
+pnpm lint
+
+# Auto-fix issues
+pnpm lint:fix
+```
+
+### ESLint Rules
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| `@typescript-eslint/no-unused-vars` | Error | No unused variables (prefix with `_` to ignore) |
+| `@typescript-eslint/no-floating-promises` | Error | Must await or handle all promises |
+| `@typescript-eslint/await-thenable` | Error | Only await promise-like values |
+| `@typescript-eslint/no-explicit-any` | Warning | Avoid `any` type (allowed in decorators) |
+| `no-duplicate-imports` | Error | No duplicate import statements |
+| `playwright/no-wait-for-timeout` | Error | Don't use `page.waitForTimeout()` |
+| `playwright/no-page-pause` | Error | Don't leave `page.pause()` in code |
+
+### Validation Commands
+
+```bash
+# Run all checks before committing
+pnpm typecheck && pnpm lint
+```
+
+---
+
 ## TypeScript Rules
 
 - **Strict Type Checking**: No `any` unless absolutely necessary.
@@ -128,6 +163,7 @@ export function getEnvironment(): Environment {
 |-------|---------|-------|
 | `@pages/*` | `tests/pages/*` | Page Objects |
 | `@steps/*` | `tests/steps/*` | Steps classes |
+| `@api` | `tests/api` | API layer (barrel export) |
 | `@api/*` | `tests/api/*` | API services, routes, schemas |
 | `@fixtures/*` | `tests/fixtures/*` | Test fixtures |
 | `@utils/*` | `utils/*` | Utility functions |
@@ -236,12 +272,17 @@ utils/
 
 ## Locator Strategy
 
+**📘 Full Methodology:** [patterns/locators.md](patterns/locators.md)
+**📘 Extraction Example:** [examples/locator-extraction-example.md](examples/locator-extraction-example.md)
+
 1.  **Search First**: Always search existing Page Objects for the element before creating a new locator.
     ```bash
     grep -r "myElement" tests/pages/
     ```
-2.  **Extract with Browser**: If the locator doesn't exist, use the **browser tool** to inspect the page and extract a precise, unique locator.
-3.  **Precise Locators**: Prefer ID > Data Attributes > Text > CSS. Avoid generic XPath or layout-dependent selectors.
+2.  **Extract with MCP**: If the locator doesn't exist, use Playwright MCP for visual analysis and HTML extraction.
+3.  **Priority Order**: Role+Name > ID > Data Attributes > ARIA > Unique Attributes > Partial Classes
+4.  **Verify Uniqueness**: Always confirm locator returns exactly 1 element via MCP.
+5.  **Always `.describe()`**: Add description to all locators for better debugging.
 
 ---
 
@@ -659,6 +700,189 @@ await assertSchema(response, AccessTokenSchema, 'Access Token Response');
 ❌ **Examples in utils documentation** → Use simple descriptions only, no `@example` blocks
 ❌ **Missing @param/@returns in utils docs** → All utils functions must have `@param` and `@returns` tags
 ❌ **Missing API Routes documentation** → All route files must have file-level JSDoc with `@see` and inline route comments
+❌ **Bypassing schema validation** → Never use `response.json()` directly; always use `assertSchema()`
+❌ **Duplicate tests** → Each test must be unique; no tests with identical assertions
+❌ **Unused imports** → Remove all unused imports immediately
+❌ **Relative imports when alias exists** → Use path aliases (`@utils/config` not `../../utils/config`)
+❌ **Missing barrel exports** → All new modules must be exported from their `index.ts`
+
+---
+
+## Barrel Exports (index.ts)
+
+**Rule:** All modules (services, pages, steps) must be exported from their directory's `index.ts` barrel file.
+
+**Why:**
+- Enables clean imports: `import { X, Y, Z } from '@api/services'`
+- Prevents import path inconsistencies
+- Makes refactoring easier
+
+**Checklist when creating new modules:**
+1. ✅ Create the module file (e.g., `NewService.ts`)
+2. ✅ Add export to barrel file (e.g., `tests/api/services/index.ts`)
+3. ✅ Import from barrel in consuming files
+
+**Example:**
+```typescript
+// tests/api/services/index.ts
+export { SearchService } from './SearchService';
+export { PageService } from './PageService';
+export { AuthService } from './AuthService';  // Don't forget new services!
+
+// Usage - import from barrel
+import { SearchService, AuthService, PageService } from '@api/services';
+```
+
+---
+
+## Schema Validation Consistency
+
+**Rule:** Always use `assertSchema()` for API response validation. Never bypass with `response.json()`.
+
+**Why:**
+- Ensures runtime type safety
+- Provides consistent error messages
+- Catches API contract violations early
+
+**✅ CORRECT:**
+```typescript
+const authResponse = await authService.getMetaUserAccessToken();
+await expect(authResponse).toHaveStatusCode(StatusCode.OK);
+
+const authData = await assertSchema(authResponse, AccessTokenSchema, 'Access Token Response');
+const accessToken = authData.access_token;
+```
+
+**❌ WRONG:**
+```typescript
+const authResponse = await authService.getMetaUserAccessToken();
+await expect(authResponse).toHaveStatusCode(StatusCode.OK);
+
+const authData = await authResponse.json();  // NO! Bypasses validation
+const accessToken = authData.access_token;
+```
+
+---
+
+## Environment Configuration
+
+**Rule:** Environment configuration files must have consistent naming.
+
+### Naming Convention
+- File name determines the environment: `dev.json`, `prod.json`, `staging.json`
+- The `"environment"` field inside must match the file name
+
+**✅ CORRECT:**
+```json
+// tests/data/environment/dev.json
+{
+    "environment": "dev",
+    "baseUrl": "https://test.wikipedia.org"
+}
+```
+
+**❌ WRONG:**
+```json
+// tests/data/environment/dev.json
+{
+    "environment": "test",  // Mismatch! Should be "dev"
+    "baseUrl": "https://test.wikipedia.org"
+}
+```
+
+### Required Files
+- `.env.example` - Template for environment variables (committed to repo)
+- `.env` - Actual secrets (NEVER committed, in `.gitignore`)
+
+---
+
+## TypeScript Global Type Declarations
+
+**Rule:** Global type declaration files (`*.d.ts`) that augment existing types must include `export {}` at the end.
+
+**Why:** Without `export {}`, TypeScript treats the file as a script (not a module), and global augmentations won't work correctly.
+
+**✅ CORRECT:**
+```typescript
+// utils/global.d.ts
+import { APIResponse } from '@playwright/test';
+
+declare global {
+    namespace PlaywrightTest {
+        interface Matchers<R> {
+            toHaveStatusCode(expectedCode: number): Promise<R>;
+        }
+    }
+}
+
+export {};  // Required for global augmentation!
+```
+
+**❌ WRONG:**
+```typescript
+// Missing export {} - won't work correctly
+declare global {
+    namespace PlaywrightTest {
+        interface Matchers<R> {
+            toHaveStatusCode(expectedCode: number): Promise<R>;
+        }
+    }
+}
+```
+
+---
+
+## Playwright Configuration
+
+**Rule:** Configure `headless` mode based on CI environment for optimal developer experience.
+
+```typescript
+// playwright.config.ts
+projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: !!process.env.CI,  // Headed locally, headless in CI
+      }
+    },
+]
+```
+
+**Benefits:**
+- Local development: Browser visible for debugging
+- CI pipeline: Headless for faster execution
+
+---
+
+## No Duplicate Tests
+
+**Rule:** Each test must be unique. Do not create tests with identical assertions.
+
+**Why:**
+- Wastes execution time
+- Creates maintenance burden
+- Indicates unclear test intent
+
+**How to identify duplicates:**
+- Same endpoint + same assertions = duplicate
+- If two tests test the same thing, merge or remove one
+
+**Example of duplicate (BAD):**
+```typescript
+test('Verify access token returns valid response', async ({ authService }) => {
+    const response = await authService.getMetaUserAccessToken();
+    await expect(response).toHaveStatusCode(StatusCode.OK);
+    await assertSchema(response, AccessTokenSchema, 'Access Token Response');
+});
+
+// This is a DUPLICATE - remove it!
+test('Verify access token response structure', async ({ authService }) => {
+    const response = await authService.getMetaUserAccessToken();
+    await expect(response).toHaveStatusCode(StatusCode.OK);
+    await assertSchema(response, AccessTokenSchema, 'Access Token Response');
+});
+```
 
 ---
 

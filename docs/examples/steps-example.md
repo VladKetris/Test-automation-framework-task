@@ -2,40 +2,36 @@
 
 ## TypeScript Implementation
 
-### ✅ RECOMMENDED: Parameterized Methods with Composite Actions
+### ✅ RECOMMENDED: Dependency Injection with Parameterized Methods
 
-Methods accept data as parameters and combine related actions.
+Steps classes receive Page Objects via constructor injection (from fixtures) and accept data as parameters.
 
 ```typescript
-import { Page } from "@playwright/test";
 import { WikipediaLoginPage } from "@pages/WikipediaLoginPage";
-import { WikipediaNavigationMenu } from "@pages/WikipediaNavigationMenu";
 import { step } from "@utils/decorators";
 
 export class WikipediaLoginSteps {
-    readonly wikipediaLoginPage: WikipediaLoginPage;
-    readonly wikipediaNavigationMenu: WikipediaNavigationMenu;
-
-    constructor(page: Page) {
-        this.wikipediaLoginPage = new WikipediaLoginPage(page);
-        this.wikipediaNavigationMenu = new WikipediaNavigationMenu(page);
-    }
+    // ✅ Receive Page Objects via constructor injection (from fixtures)
+    constructor(
+        readonly loginPage: WikipediaLoginPage
+    ) { }
 
     @step('Verify Login page is opened')
     async verifyPageOpened(): Promise<void> {
-        await this.wikipediaLoginPage.verifyPageOpened();
+        await this.loginPage.verifyPageOpened();
+        await this.loginPage.verifyLoginPageTitle();
     }
 
     // ✅ Atomic: accepts credentials as parameters
     @step('Enter Username "{0}" and Password on the Login Page')
     async enterCredentials(username: string, password: string): Promise<void> {
-        await this.wikipediaLoginPage.enterUsername(username);
-        await this.wikipediaLoginPage.enterPassword(password);
+        await this.loginPage.enterUsername(username);
+        await this.loginPage.enterPassword(password);
     }
 
     @step('Click "Log in" on the Login Page')
     async clickLoginButton(): Promise<void> {
-        await this.wikipediaLoginPage.clickLogin();
+        await this.loginPage.clickLogin();
     }
 
     // ✅ Composite: combines enterCredentials + clickLoginButton
@@ -87,16 +83,18 @@ test.describe('Wikipedia Login Tests', () => {
 
 ```typescript
 // tests/fixtures/steps.fixture.ts
-import { test as apiTest } from "@fixtures/api.fixture";
+import { test as apiTest } from "./api.fixture";
 import { WikipediaLoginSteps } from "@steps/WikipediaLoginSteps";
 
 type StepsFixtures = {
     wikipediaLoginSteps: WikipediaLoginSteps;
 };
 
-export const test = base.extend<StepsFixtures>({
-    wikipediaLoginSteps: async ({ page }, use) => {
-        await use(new WikipediaLoginSteps(page));
+// ✅ Steps receive Page Objects via dependency injection
+export const test = apiTest.extend<StepsFixtures>({
+    // Page Objects are injected from pages.fixture.ts (via api.fixture.ts chain)
+    wikipediaLoginSteps: async ({ wikipediaLoginPage }, use) => {
+        await use(new WikipediaLoginSteps(wikipediaLoginPage));
     },
 });
 ```

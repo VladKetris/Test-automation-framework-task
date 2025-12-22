@@ -1,5 +1,5 @@
-import { expect, Locator, Page, Download } from '@playwright/test';
-import { getEnvironment } from '../../utils/config';
+import { expect, Locator, Page } from '@playwright/test';
+import { getEnvironment } from '@utils/config';
 
 export class BasePage {
     protected readonly name: string;

@@ -1,9 +1,7 @@
 import { test as pagesTest } from './pages.fixture';
 import { ApiClient } from '@utils/api-client';
-import { SearchService } from '@api/services';
-import { getEnvironment } from '../../utils/config';
-import { AuthService } from '@api/services/AuthService';
-import { PageService } from '@api/services';
+import { SearchService, AuthService, PageService } from '@api/services';
+import { getEnvironment } from '@utils/config';
 import { expect } from '@playwright/test';
 import { matchers } from '@utils/matchers';
 

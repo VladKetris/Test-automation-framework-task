@@ -1,5 +1,5 @@
 {
-    "environment": "test",
+    "environment": "dev",
     "baseUrl": "https://test.wikipedia.org",
     "api": {
         "apiUrl": "https://api.wikimedia.org/core/v1/wikipedia/en",
