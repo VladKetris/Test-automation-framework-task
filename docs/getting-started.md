@@ -196,46 +196,6 @@ pnpm test tests/specs/my-first-test.spec.ts --debug
 pnpm test tests/specs/my-first-test.spec.ts --ui
 ```
 
-## Test Tags and Global Preconditions
-
-The framework supports test tags for global preconditions that apply across multiple test files.
-
-### Available Tags
-
-- **`@ui_auth`** - Automatically authenticates user via UI login flow before test execution
-
-### Usage
-
-Add the tag to your test definition:
-
-```typescript
-import { test } from '@fixtures';
-
-test('Edit article', { tag: ['@ui_auth'] }, async ({
-    wikipediaArticlePage,
-    wikipediaArticleEditSteps
-}) => {
-    // User is already authenticated by global hook
-    await wikipediaArticlePage.clickEdit();
-    await wikipediaArticleEditSteps.editContentAndPublish('New content');
-});
-```
-
-**How it works:**
-- Global hook in `tests/fixtures/global-hooks.fixture.ts` checks for `@ui_auth` tag
-- If tag is present, automatically calls `wikipediaAuthSteps.authenticateUser()`
-- No need to duplicate authentication code in each test file
-
-### Running Tests by Tag
-
-```bash
-# Run all tests with @ui_auth tag
-pnpm test --grep "@ui_auth"
-
-# Run tests with multiple tags
-pnpm test --grep "@ui_auth|@smoke"
-```
-
 ## Running Tests
 
 ### Basic Commands

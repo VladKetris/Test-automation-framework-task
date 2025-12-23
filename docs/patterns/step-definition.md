@@ -89,13 +89,11 @@ export const test = apiTest.extend<StepsFixtures>({
 |------|--------|
 | ✅ `private readonly` for PO | Proper encapsulation |
 | ✅ `@step` decorator on ALL methods | Clear reporting in HTML report |
-| ✅ JSDoc on complex methods | Documentation for non-obvious behavior |
+| ✅ JSDoc on ALL methods | Documentation standard |
 | ✅ Accept data as parameters | Reusability across scenarios |
-| ✅ Accept credentials as parameters | Never read secrets internally |
 | ❌ No locators in Steps | Maintainability (keep in PO) |
 | ❌ No `new PageObject()` | Violation of DI pattern |
 | ❌ No hardcoded data | Flexibility for different test cases |
-| ❌ No reading secrets internally | Tests pass credentials to Steps |
 
 ---
 

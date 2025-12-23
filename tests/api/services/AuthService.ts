@@ -5,10 +5,7 @@ import { GetAccessTokenRequestModel, GetAccessTokenRequest, GetCsrfTokenQueryPar
 import { Headers, buildBearerAuthHeader } from '@api/constants';
 
 export class AuthService {
-    constructor(
-        private readonly client: ApiClient,
-        private readonly actionApiClient?: ApiClient
-    ) { }
+    constructor(private readonly client: ApiClient) { }
 
     /**
      * Get OAuth access token for Meta user
@@ -25,9 +22,8 @@ export class AuthService {
      */
     async getCsrfToken(accessToken: string): Promise<APIResponse> {
         const queryParams = GetCsrfTokenQueryParamsModel.buildQueryParams();
-        const apiClient = this.actionApiClient || this.client;
 
-        return apiClient.get(MediaWikiActionRoutes.API, {
+        return this.client.get(MediaWikiActionRoutes.API, {
             params: queryParams,
             headers: {
                 [Headers.AUTHORIZATION]: buildBearerAuthHeader(accessToken)

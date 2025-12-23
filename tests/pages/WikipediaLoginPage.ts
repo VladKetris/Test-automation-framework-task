@@ -15,21 +15,33 @@ export class WikipediaLoginPage extends BasePage {
         this.loginButton = page.locator('button#wpLoginAttempt').describe('Login button');
     }
 
+    /**
+     * Enter username
+     */
     async enterUsername(username: string): Promise<void> {
         await this.elementToBeVisible(this.usernameInput);
         await this.usernameInput.fill(username);
     }
 
+    /**
+     * Enter password
+     */
     async enterPassword(password: string): Promise<void> {
         await this.elementToBeVisible(this.passwordInput);
         await this.passwordInput.fill(password);
     }
 
+    /**
+     * Click login button
+     */
     async clickLogin(): Promise<void> {
         await this.elementToBeVisible(this.loginButton);
         await this.loginButton.click();
     }
 
+    /**
+     * Verify login page title
+     */
     async verifyLoginPageTitle(): Promise<void> {
         await this.verifyPageTitle(LOGIN_PAGE_TITLE);
     }

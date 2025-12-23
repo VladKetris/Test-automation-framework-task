@@ -171,38 +171,6 @@ test.describe('Wikipedia Account Creation', () => {
 });
 ```
 
-## 5. Authentication Pattern
-
-For tests requiring authentication, use the `WikipediaAuthSteps` with credentials passed as parameters:
-
-```typescript
-import { test } from '@fixtures';
-import { getWikipediaCredentials } from '@utils/secrets';
-
-test.describe('Wikipedia Authenticated Features', () => {
-    test('Create new article', async ({
-        wikipediaAuthSteps,
-        wikipediaArticleCreateSteps,
-        wikipediaVisualEditorPage
-    }) => {
-        // Get credentials at test level
-        const { username, password } = getWikipediaCredentials();
-        
-        // Authenticate user via Steps (credentials passed as parameters)
-        await wikipediaAuthSteps.authenticateUser(username, password);
-        
-        // Continue with authenticated actions
-        await wikipediaArticleCreateSteps.navigateToCreateNewPage();
-        // ... rest of test
-    });
-});
-```
-
-**Authentication Rules:**
-- Always read credentials at the test level using `getWikipediaCredentials()`
-- Pass credentials as parameters to Steps (never read secrets inside Steps)
-- Use `WikipediaAuthSteps.authenticateUser()` for full login flow
-
 ## Key Patterns Demonstrated
 
 1. **Test constants** - No magic values, use named constants
@@ -211,4 +179,3 @@ test.describe('Wikipedia Authenticated Features', () => {
 4. **`@step` decorator** - All Steps methods are decorated for reporting
 5. **Random data** - Use `testDataGenerator` for unique test data
 6. **Mixed PO + Steps** - Choose based on business meaning, not line count
-7. **Credentials as parameters** - Read secrets at test level, pass to Steps

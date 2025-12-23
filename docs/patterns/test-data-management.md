@@ -494,36 +494,14 @@ WIKI_META_CLIENT_SECRET=your_client_secret
 ### Best Practices
 
 #### ✅ DO
-- Use in tests only (at the test level)
+- Use in tests and API builders only
 - Add required vars to `.env.example`
 - Pass credentials as parameters to Steps
-- Read secrets once and pass down as parameters
 
 #### ❌ DON'T
-- **Use inside Steps** - Steps must accept credentials as parameters
-- Use inside Page Objects
+- Use inside Steps or Page Objects
 - Commit actual credentials
 - Access `process.env` directly
-
-**Example - Correct Pattern:**
-```typescript
-// In test file - read secrets here
-const { username, password } = getWikipediaCredentials();
-
-// Pass to Steps as parameters
-await wikipediaAuthSteps.authenticateUser(username, password);
-```
-
-**Example - Anti-Pattern:**
-```typescript
-// ❌ DON'T read secrets inside Steps
-export class BadAuthSteps {
-    async authenticateUser(): Promise<void> {
-        const { username, password } = getWikipediaCredentials(); // WRONG!
-        // ...
-    }
-}
-```
 
 ---
 

@@ -228,32 +228,18 @@ export class WikipediaAuthSteps {
 
 ## Anti-Patterns to Avoid
 
-### ❌ Reading Secrets Inside Steps
+### ❌ Hardcoded or Environment-Read Data
 
 ```typescript
 // ❌ BAD: Reading secrets inside Steps
-import { getWikipediaCredentials } from '@utils/secrets';
-
-@step('Authenticate user')
-async authenticateUser(): Promise<void> {
-    const { username, password } = getWikipediaCredentials();  // DON'T DO THIS
+@step('Login')
+async login(): Promise<void> {
+    const username = process.env.USERNAME;
+    const password = 'hardcoded123';
+    
     await this.loginPage.enterUsername(username);
     await this.loginPage.enterPassword(password);
 }
-
-// ✅ GOOD: Accept credentials as parameters
-@step('Authenticate user "{0}"')
-async authenticateUser(username: string, password: string): Promise<void> {
-    await this.loginPage.enterUsername(username);
-    await this.loginPage.enterPassword(password);
-}
-```
-
-**Usage in tests:**
-```typescript
-// Tests read secrets and pass to Steps
-const { username, password } = getWikipediaCredentials();
-await wikipediaAuthSteps.authenticateUser(username, password);
 ```
 
 ### ❌ Creating Page Objects Inside Steps
@@ -308,11 +294,10 @@ async login(username: string, password: string): Promise<void> {
 |----------|-------------|
 | `private readonly` | Constructor parameters with proper visibility |
 | `@step` decorator | On ALL public methods |
-| JSDoc comments | On methods with non-obvious behavior |
-| Parameters | Accept data (including credentials) as method parameters |
+| JSDoc comments | On ALL public methods |
+| Parameters | Accept data as method parameters |
 | DI pattern | Receive Page Objects via constructor |
 | Composite methods | Combine frequently-used action sequences |
-| No internal secrets | Never read secrets inside Steps |
 
 ---
 

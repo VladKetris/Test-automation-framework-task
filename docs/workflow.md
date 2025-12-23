@@ -71,12 +71,6 @@ Choose based on intent, not line count. Keep test-specific constants inside the 
 - Keep test-specific data/constants **inside the test** unless it truly applies to every test
 - Prefer **API Steps** for setup/teardown when possible (faster and more reliable than UI)
 
-**Authentication Preconditions**
-- For tests requiring authentication, use `WikipediaAuthSteps.authenticateUser(username, password)`
-- Read credentials at test level using `getWikipediaCredentials()` from `@utils/secrets`
-- Pass credentials as parameters to Steps (never read secrets inside Steps)
-- Example: `await wikipediaAuthSteps.authenticateUser(username, password);`
-
 **Assertions (URL)**
 - 🔴 **Never assert URLs** in tests/steps/page objects. Use page-level UI signals (heading/content/title) instead.
 
