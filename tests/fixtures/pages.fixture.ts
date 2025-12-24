@@ -1,8 +1,4 @@
-import { test as base, expect } from '@playwright/test';
-import { matchers } from '@utils/matchers';
-
-// Extend expect with custom matchers (done once at lowest fixture level)
-expect.extend(matchers);
+import { test as base } from '@playwright/test';
 
 // Page Objects imports
 import {
@@ -10,10 +6,7 @@ import {
     WikipediaMainPage,
     WikipediaLoginPage,
     WikipediaNavigationMenu,
-    WikipediaDonatePage,
-    WikipediaCreatePagePage,
-    WikipediaVisualEditorPage,
-    WikipediaSaveChangesDialogPage
+    WikipediaDonatePage
 } from '@pages';
 
 /**
@@ -25,9 +18,6 @@ type PagesFixtures = {
     wikipediaLoginPage: WikipediaLoginPage;
     wikipediaNavigationMenu: WikipediaNavigationMenu;
     wikipediaDonatePage: WikipediaDonatePage;
-    wikipediaCreatePagePage: WikipediaCreatePagePage;
-    wikipediaVisualEditorPage: WikipediaVisualEditorPage;
-    wikipediaSaveChangesDialogPage: WikipediaSaveChangesDialogPage;
 };
 
 
@@ -54,18 +44,6 @@ export const test = base.extend<AllPagesFixtures>({
 
     wikipediaDonatePage: async ({ page }, use) => {
         await use(new WikipediaDonatePage(page));
-    },
-
-    wikipediaCreatePagePage: async ({ page }, use) => {
-        await use(new WikipediaCreatePagePage(page));
-    },
-
-    wikipediaVisualEditorPage: async ({ page }, use) => {
-        await use(new WikipediaVisualEditorPage(page));
-    },
-
-    wikipediaSaveChangesDialogPage: async ({ page }, use) => {
-        await use(new WikipediaSaveChangesDialogPage(page));
     },
 
 });

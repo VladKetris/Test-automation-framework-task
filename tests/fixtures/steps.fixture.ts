@@ -3,12 +3,8 @@ import { test as apiTest } from './api.fixture';
 // Steps imports
 import {
     WikipediaMainSteps,
-    WikipediaLoginSteps,
-    WikipediaSearchSteps,
-    WikipediaArticleEditSteps,
-    WikipediaArticleCreateSteps
+    WikipediaLoginSteps
 } from '@steps';
-import { WikipediaAuthSteps } from '@steps/WikipediaAuthSteps';
 
 /**
  * Steps fixtures - creates Steps with injected Page Objects
@@ -16,10 +12,6 @@ import { WikipediaAuthSteps } from '@steps/WikipediaAuthSteps';
 type StepsFixtures = {
     wikipediaMainSteps: WikipediaMainSteps;
     wikipediaLoginSteps: WikipediaLoginSteps;
-    wikipediaSearchSteps: WikipediaSearchSteps;
-    wikipediaArticleEditSteps: WikipediaArticleEditSteps;
-    wikipediaArticleCreateSteps: WikipediaArticleCreateSteps;
-    wikipediaAuthSteps: WikipediaAuthSteps;
 };
 
 /**
@@ -41,22 +33,6 @@ export const test = apiTest.extend<StepsFixtures>({
 
     wikipediaLoginSteps: async ({ wikipediaLoginPage }, use) => {
         await use(new WikipediaLoginSteps(wikipediaLoginPage));
-    },
-
-    wikipediaSearchSteps: async ({ wikipediaNavigationMenu, wikipediaArticlePage }, use) => {
-        await use(new WikipediaSearchSteps(wikipediaNavigationMenu, wikipediaArticlePage));
-    },
-
-    wikipediaArticleEditSteps: async ({ wikipediaVisualEditorPage, wikipediaSaveChangesDialogPage }, use) => {
-        await use(new WikipediaArticleEditSteps(wikipediaVisualEditorPage, wikipediaSaveChangesDialogPage));
-    },
-
-    wikipediaArticleCreateSteps: async ({ wikipediaCreatePagePage, wikipediaNavigationMenu }, use) => {
-        await use(new WikipediaArticleCreateSteps(wikipediaCreatePagePage, wikipediaNavigationMenu));
-    },
-
-    wikipediaAuthSteps: async ({ wikipediaMainSteps, wikipediaNavigationMenu, wikipediaLoginSteps, wikipediaMainPage }, use) => {
-        await use(new WikipediaAuthSteps(wikipediaMainSteps, wikipediaNavigationMenu, wikipediaLoginSteps, wikipediaMainPage));
     },
 });
 

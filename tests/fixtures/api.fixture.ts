@@ -3,6 +3,11 @@ import { ApiClient } from '@utils/api-client';
 import { SearchService, AuthService, PageService } from '@api/services';
 import { WikipediaAuthApiSteps } from '@api-steps';
 import { getEnvironment } from '@utils/config';
+import { expect } from '@playwright/test';
+import { matchers } from '@utils/matchers';
+
+// Extend expect with custom matchers for API tests
+expect.extend(matchers);
 
 /**
  * API Fixture Types
@@ -42,9 +47,8 @@ export const test = pagesTest.extend<ApiFixtures>({
 
     authService: async ({ request }, use) => {
         const env = getEnvironment();
-        const oauthClient = new ApiClient(request, env.api.metaRestUrl);
-        const actionApiClient = new ApiClient(request, env.baseUrl);
-        await use(new AuthService(oauthClient, actionApiClient));
+        const client = new ApiClient(request, env.baseUrl);
+        await use(new AuthService(client));
     },
 
     searchService: async ({ request }, use) => {
@@ -55,12 +59,11 @@ export const test = pagesTest.extend<ApiFixtures>({
 
     pageService: async ({ request }, use) => {
         const env = getEnvironment();
-        const restApiClient = new ApiClient(request, env.api.apiUrl);
-        const actionApiClient = new ApiClient(request, env.baseUrl);
-        await use(new PageService(restApiClient, actionApiClient));
+        const client = new ApiClient(request, env.baseUrl);
+        await use(new PageService(client));
     },
 
-    wikipediaAuthApiSteps: async ({ authService }, use) => {
-        await use(new WikipediaAuthApiSteps(authService));
+    wikipediaAuthApiSteps: async ({ authService, pageService }, use) => {
+        await use(new WikipediaAuthApiSteps(authService, pageService));
     },
 });

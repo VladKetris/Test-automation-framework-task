@@ -1,5 +1,5 @@
 import { step } from '@utils/decorators';
-import { AuthService } from '@api/services';
+import { AuthService, PageService } from '@api/services';
 import { expect } from '@playwright/test';
 import { StatusCode } from '@api/constants';
 import { assertSchema } from '@utils/parse-response';
@@ -7,7 +7,8 @@ import { AccessTokenSchema, CsrfTokenSchema } from '@api/schemas';
 
 export class WikipediaAuthApiSteps {
     constructor(
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly pageService: PageService
     ) { }
 
     /**

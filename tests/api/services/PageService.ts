@@ -5,10 +5,7 @@ import { Headers, buildBearerAuthHeader } from '@api/constants';
 import { CreatePageRequestModel, EditPageQueryParamsModel } from '@api/builders';
 
 export class PageService {
-    constructor(
-        private readonly client: ApiClient,
-        private readonly actionApiClient?: ApiClient
-    ) { }
+    constructor(private readonly client: ApiClient) { }
 
     /**
      * Get page content (bare)
@@ -48,9 +45,8 @@ export class PageService {
             summary
         );
         const queryParams = EditPageQueryParamsModel.buildQueryParams();
-        const apiClient = this.actionApiClient || this.client;
 
-        return apiClient.post(MediaWikiActionRoutes.API, {
+        return this.client.post(MediaWikiActionRoutes.API, {
             params: queryParams,
             form: formData,
             headers: {
