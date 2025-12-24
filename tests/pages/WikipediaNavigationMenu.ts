@@ -96,17 +96,14 @@ export class WikipediaNavigationMenu extends BasePage {
     }
 
     async clickLogOut(): Promise<void> {
-        await this.elementToBeVisible(this.logOutLink);
         await this.logOutLink.click();
     }
 
     async enterSearchText(text: string): Promise<void> {
-        await this.elementToBeVisible(this.searchInput);
         await this.searchInput.fill(text);
     }
 
     async clickSearch(): Promise<void> {
-        await this.elementToBeVisible(this.searchButton);
         await this.searchButton.click();
     }
 
@@ -115,12 +112,10 @@ export class WikipediaNavigationMenu extends BasePage {
     }
 
     async openMainMenu(): Promise<void> {
-        await this.elementToBeVisible(this.mainMenuCheckbox);
         await this.mainMenuCheckbox.click();
     }
 
     async clickCreateNewPageInSidebar(): Promise<void> {
-        await this.elementToBeVisible(this.createNewPageSidebarLink);
         await this.createNewPageSidebarLink.click();
     }
 }

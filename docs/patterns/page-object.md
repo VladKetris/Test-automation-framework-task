@@ -238,7 +238,6 @@ export class PageName extends BasePage {
      * Click submit button
      */
     async clickSubmit(): Promise<void> {
-        await this.elementToBeVisible(this.submitButton);
         await this.submitButton.click();
     }
 

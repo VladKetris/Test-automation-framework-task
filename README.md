@@ -36,8 +36,6 @@ npx playwright test tests/specs/wikipedia-login.spec.ts
 # Run tests with specific tag
 npx playwright test --grep "@smoke"
 
-# Run tests with authentication tag
-npx playwright test --grep "@ui_auth"
 
 # Run in debug mode
 npx playwright test --debug
@@ -207,7 +205,7 @@ Playwright-SDD/
 | **Page Object Model** | Maintainable UI abstraction with BasePage checks |
 | **MCP-Based Locators** | Visual analysis and verification via Playwright MCP |
 | **Spec Driven** | Tests derived from Gherkin specifications |
-| **Test Tags** | Global preconditions via tags (e.g., `@ui_auth` for automatic authentication) |
+| **Test Tags** | Test organization via tags |
 | **ESLint** | TypeScript and Playwright-specific linting rules |
 | **Zod Schemas** | Runtime API response validation |
 | **ReportPortal** | Centralized test reporting (optional) |

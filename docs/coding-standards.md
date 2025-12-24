@@ -738,6 +738,7 @@ await assertSchema(response, AccessTokenSchema, 'Access Token Response');
 ❌ **Unused imports** → Remove all unused imports immediately
 ❌ **Relative imports when alias exists** → Use path aliases (`@utils/config` not `../../utils/config`)
 ❌ **Missing barrel exports** → All new modules must be exported from their `index.ts`
+❌ **Redundant visibility checks before actions** → Playwright's `fill()`, `click()`, and other action methods already wait for visibility. Only use `elementToBeVisible()` before verification methods (assertions) or text retrieval.
 
 ---
 

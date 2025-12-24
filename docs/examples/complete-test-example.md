@@ -29,22 +29,18 @@ export class WikipediaCreateAccountPage extends BasePage {
     }
 
     async enterUsername(username: string): Promise<void> {
-        await this.elementToBeVisible(this.usernameInput);
         await this.usernameInput.fill(username);
     }
 
     async enterPassword(password: string): Promise<void> {
-        await this.elementToBeVisible(this.passwordInput);
         await this.passwordInput.fill(password);
     }
 
     async enterConfirmPassword(password: string): Promise<void> {
-        await this.elementToBeVisible(this.confirmPasswordInput);
         await this.confirmPasswordInput.fill(password);
     }
 
     async clickCreateAccount(): Promise<void> {
-        await this.elementToBeVisible(this.createAccountButton);
         await this.createAccountButton.click();
     }
 }

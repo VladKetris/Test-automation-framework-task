@@ -81,7 +81,6 @@ export class LoginPage extends BasePage {
      * Enter username
      */
     async enterUsername(username: string): Promise<void> {
-        await this.elementToBeVisible(this.usernameField);
         await this.usernameField.fill(username);
     }
 
@@ -89,7 +88,6 @@ export class LoginPage extends BasePage {
      * Enter password
      */
     async enterPassword(password: string): Promise<void> {
-        await this.elementToBeVisible(this.passwordField);
         await this.passwordField.fill(password);
     }
 
@@ -97,7 +95,6 @@ export class LoginPage extends BasePage {
      * Click login button
      */
     async clickLogin(): Promise<void> {
-        await this.elementToBeVisible(this.submitButton);
         await this.submitButton.click();
     }
 
@@ -159,7 +156,6 @@ export class LoginPage extends BasePage {
      * Enter username
      */
     async enterUsername(username: string): Promise<void> {
-        await this.elementToBeVisible(this.usernameField);
         await this.usernameField.fill(username);  // Error: "Username input field" not found
     }
 
@@ -167,7 +163,6 @@ export class LoginPage extends BasePage {
      * Click login button
      */
     async clickLogin(): Promise<void> {
-        await this.elementToBeVisible(this.submitButton);
         await this.submitButton.click();  // Error: "Login submit button" not found
     }
 }
@@ -272,6 +267,55 @@ await this.elementToHaveText(this.usernameLink, 'JohnDoe');
 await this.elementToContainText(this.errorMessage, 'Invalid');
 ```
 
+### When to Use elementToBeVisible()
+
+**✅ Use `elementToBeVisible()` for:**
+- Verification methods (assertions) - before `elementToHaveText()`, `elementToContainText()`, etc.
+- Before retrieving text content - when calling `innerText()`, `textContent()`, etc.
+- State verification - when you need to explicitly verify visibility as part of test logic
+
+**❌ Don't use `elementToBeVisible()` before:**
+- Action methods like `fill()`, `click()`, `hover()`, `selectOption()` - these already wait for visibility automatically
+- Playwright's built-in auto-waiting handles visibility checks for all action methods
+
+**Examples:**
+
+```typescript
+// ✅ GOOD: Use elementToBeVisible before verification
+async verifyErrorDisplayed(expectedError: string): Promise<void> {
+    await this.elementToBeVisible(this.errorMessage);
+    await this.elementToHaveText(this.errorMessage, expectedError);
+}
+
+// ✅ GOOD: Use elementToBeVisible before retrieving text
+async getArticleTitle(): Promise<string> {
+    await this.elementToBeVisible(this.articleTitle);
+    return this.articleTitle.innerText();
+}
+
+// ❌ BAD: Redundant visibility check before fill()
+async enterUsername(username: string): Promise<void> {
+    await this.elementToBeVisible(this.usernameField);  // ❌ Redundant
+    await this.usernameField.fill(username);
+}
+
+// ✅ GOOD: Direct action - fill() already waits for visibility
+async enterUsername(username: string): Promise<void> {
+    await this.usernameField.fill(username);
+}
+
+// ❌ BAD: Redundant visibility check before click()
+async clickLogin(): Promise<void> {
+    await this.elementToBeVisible(this.submitButton);  // ❌ Redundant
+    await this.submitButton.click();
+}
+
+// ✅ GOOD: Direct action - click() already waits for visibility
+async clickLogin(): Promise<void> {
+    await this.submitButton.click();
+}
+```
+
 ---
 
 ## Best Practices
@@ -289,7 +333,7 @@ await this.elementToContainText(this.errorMessage, 'Invalid');
 - Rely on Playwright's built-in auto-waiting
 - Use specific locators (IDs, test IDs, ARIA roles) when possible
 - Search existing Page Objects for similar locator patterns
-- Check element visibility before interaction when needed
+- Use `elementToBeVisible()` before verification methods (assertions) or text retrieval
 
 ### ❌ DON'T
 - Create custom wrapper classes for elements
@@ -300,6 +344,7 @@ await this.elementToContainText(this.errorMessage, 'Invalid');
 - Access internal Playwright APIs unless absolutely necessary
 - Use public or protected visibility for locators (use `private readonly`)
 - Skip `.describe()` on locators
+- **Use redundant visibility checks before actions** - Playwright's `fill()`, `click()`, and other action methods already wait for visibility automatically. Only use `elementToBeVisible()` before verification methods (assertions) or when retrieving text content.
 
 ---
 
@@ -328,7 +373,6 @@ private readonly usernameField: Locator;
 private readonly submitButton: Locator;
 
 this.usernameField = page.locator("#username").describe("Username field");
-await this.elementToBeVisible(this.usernameField);
 await this.usernameField.fill("user");
 await this.submitButton.click();
 ```

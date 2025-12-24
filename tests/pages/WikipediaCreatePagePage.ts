@@ -16,12 +16,10 @@ export class WikipediaCreatePagePage extends BasePage {
     }
 
     async enterPageTitle(title: string): Promise<void> {
-        await this.elementToBeVisible(this.pageTitleInput);
         await this.pageTitleInput.fill(title);
     }
 
     async clickCreateNewPage(): Promise<void> {
-        await this.elementToBeVisible(this.createButton);
         await this.createButton.click();
     }
 }

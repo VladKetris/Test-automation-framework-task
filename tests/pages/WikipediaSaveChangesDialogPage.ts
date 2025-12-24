@@ -16,12 +16,10 @@ export class WikipediaSaveChangesDialogPage extends BasePage {
     }
 
     async enterEditSummary(summary: string): Promise<void> {
-        await this.elementToBeVisible(this.editSummaryInput);
         await this.editSummaryInput.fill(summary);
     }
 
     async clickPublish(): Promise<void> {
-        await this.elementToBeVisible(this.publishButton);
         await this.publishButton.click();
     }
 }

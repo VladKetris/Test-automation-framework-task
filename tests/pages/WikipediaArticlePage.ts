@@ -51,7 +51,6 @@ export class WikipediaArticlePage extends BasePage {
     }
 
     async clickEdit(): Promise<void> {
-        await this.elementToBeVisible(this.editButton);
         await this.editButton.click();
     }
 }

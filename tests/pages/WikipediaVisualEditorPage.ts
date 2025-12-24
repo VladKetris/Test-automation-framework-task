@@ -28,13 +28,11 @@ export class WikipediaVisualEditorPage extends BasePage {
     }
 
     async enterContentLine(content: string): Promise<void> {
-        await this.elementToBeVisible(this.editorTextbox);
         await this.editorTextbox.click();
         await this.page.keyboard.type(content);
     }
 
     async replaceContentWith(content: string): Promise<void> {
-        await this.elementToBeVisible(this.editorTextbox);
         await this.editorTextbox.click();
 
         const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
