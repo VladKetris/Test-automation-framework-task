@@ -32,7 +32,7 @@
     - Prefer simple, semantic locators (e.g., `page.getByRole('link', { name: 'Edit' })`) over complex structural selectors
     - **Example:** Article pages use "Edit" link (unique), Main Page uses "View source" (different) - verify both pages to ensure uniqueness
 15. **🔴 Expect assertions in BasePage** - Any verification using Playwright expect matchers (like `toHaveTitle`, `toBeVisible`, `toHaveText`, etc.) must be added to `BasePage` as a generic method. Page Objects should call the BasePage method, not use `expect()` directly.
-16. **🔴 JSDoc on all methods** - All public methods in Page Objects must have JSDoc comments describing what they do. Use concise, action-oriented descriptions.
+16. **JSDoc on complex methods** - Methods with non-obvious behavior should have JSDoc comments. Simple self-documenting methods (like `clickLogin()`) may omit JSDoc if the method name clearly conveys intent.
 17. **🔴 Page Object-specific constants** - Constants specific to a Page Object (like page titles, specific text values) must be stored as constants at the top of the Page Object file. Use UPPER_SNAKE_CASE naming.
 18. **🔴 Locator extraction process** - Follow [locators.md](locators.md) methodology for creating new locators. **MCP verification is MANDATORY** - Always verify uniqueness before implementation.
 19. **🔴 Dynamic locators as arrow functions** - For parameterized locators (by index, text, etc.), use arrow function class properties instead of inline creation in methods. **Use dynamic locators directly** - Call the arrow function directly in methods (e.g., `this.paragraphs(index)`), do not create intermediate variables or helper methods.
@@ -83,41 +83,39 @@ export class ConfirmDialogPopupPage extends BasePage {
 
 ## JSDoc Documentation
 
-**Rule:** All public methods in Page Objects must have JSDoc comments.
+**Rule:** Methods with non-obvious behavior should have JSDoc comments. Simple self-documenting methods may omit JSDoc.
 
-**Format:**
-- Use concise, action-oriented descriptions
-- Start with a verb (e.g., "Click", "Enter", "Verify", "Get")
-- Keep descriptions brief (one line when possible)
+**When to use JSDoc:**
+- Methods with parameters that need explanation
+- Methods with complex/multi-step behavior
+- Methods where the name doesn't fully convey intent
+
+**When to omit JSDoc:**
+- Self-documenting methods like `clickLogin()`, `enterUsername()`
+- Methods where the name clearly describes the action
 
 **Examples:**
 
 ```typescript
-// ✅ GOOD: Clear, concise JSDoc
+// ✅ GOOD: JSDoc for method with parameters that need explanation
 /**
- * Click submit button
+ * Verify paragraph at specified index contains expected text
+ * @param expectedText Expected text in paragraph
+ * @param index Paragraph index (0-based, defaults to 0)
  */
-async clickSubmit(): Promise<void> {
-    await this.submitButton.click();
+async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
+    const paragraph = this.paragraphs(index);
+    await this.elementToContainText(paragraph, expectedText);
 }
 
-/**
- * Enter username
- */
+// ✅ GOOD: Self-documenting method (JSDoc optional)
+async clickLogin(): Promise<void> {
+    await this.loginButton.click();
+}
+
+// ✅ GOOD: Self-documenting method (JSDoc optional)
 async enterUsername(username: string): Promise<void> {
     await this.usernameInput.fill(username);
-}
-
-/**
- * Verify page title
- */
-async verifyPageTitle(): Promise<void> {
-    await this.verifyPageTitle(/Expected Title/i);
-}
-
-// ❌ BAD: Missing JSDoc
-async clickSubmit(): Promise<void> {
-    await this.submitButton.click();
 }
 ```
 
@@ -240,7 +238,6 @@ export class PageName extends BasePage {
      * Click submit button
      */
     async clickSubmit(): Promise<void> {
-        await this.elementToBeVisible(this.submitButton);
         await this.submitButton.click();
     }
 
@@ -248,7 +245,6 @@ export class PageName extends BasePage {
      * Get message text
      */
     async getMessageText(): Promise<string> {
-        await this.elementToBeVisible(this.messageLabel);
         const text = await this.messageLabel.textContent();
         return text || "";
     }

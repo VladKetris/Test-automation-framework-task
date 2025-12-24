@@ -45,7 +45,7 @@ pnpm typecheck && pnpm lint
 - **Async/Await**: Always use `async/await` for Playwright interactions.
 - **Explicit Return Types**: Define return types for all methods.
 - **Meaningful Names**: Descriptive variable and function names.
-- **JSDoc**: Documentation for classes and public methods. **All Page Object methods must have JSDoc comments.**
+- **JSDoc**: Documentation for classes and public methods with non-obvious behavior. Simple self-documenting methods (like `clickLogin()`) may omit JSDoc if the method name clearly conveys intent.
 - **Assertion Standards**: Use custom matchers (`toHaveStatusCode`) and schema validation helpers (`assertSchema`).
 
 ---
@@ -449,13 +449,42 @@ public getRandomArticle(): string {
 
 ## Test Structure: Preconditions
 
-**Rule:** If a test has a **reusable precondition** (e.g., “log in as a specific user”), implement it in `test.beforeEach(...)` inside the same `test.describe(...)` block.
+**Rule:** If a test has a **reusable precondition** (e.g., "log in as a specific user"), implement it in `test.beforeEach(...)` inside the same `test.describe(...)` block.
 
 - **Use `beforeEach` when**: every test in the file needs the same setup (login, navigation to a starting page, common API setup).
-- **Do not use `beforeEach` for**: steps that are specific to only one test’s scenario (keep those inside the test).
+- **Do not use `beforeEach` for**: steps that are specific to only one test's scenario (keep those inside the test).
 - **Keep it Steps-only**: `beforeEach` must call **Steps** methods only (same as spec tests).
 - **Data rule**: constants used by all tests in the file may live at `describe` scope; test-specific constants remain inside each test.
 - **Prefer API setup**: when preconditions are about data, use API Steps rather than UI.
+
+## Test Structure: Authentication Preconditions
+
+**Rule:** For tests requiring authentication, use Steps with credentials passed as parameters.
+
+- **Read credentials at test level**: Use `getWikipediaCredentials()` from `@utils/secrets`
+- **Pass to Steps**: Call `wikipediaAuthSteps.authenticateUser(getWikipediaCredentials())`
+- **Never read secrets inside Steps**: Steps accept credentials as parameters
+
+**Example:**
+```typescript
+import { getWikipediaCredentials } from '@utils/secrets';
+
+test('Edit article', async ({
+    wikipediaAuthSteps,
+    wikipediaArticlePage,
+    wikipediaArticleEditSteps
+}) => {
+    await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
+    
+    await wikipediaArticlePage.clickEdit();
+    await wikipediaArticleEditSteps.editContentAndPublish('New content');
+});
+```
+
+**Benefits:**
+- Clear data flow (credentials visible at test level)
+- Testable with different credentials
+- Follows "Steps accept data as parameters" pattern
 
 ## Test Structure: Step Comments in Spec Files
 
@@ -694,8 +723,11 @@ await assertSchema(response, AccessTokenSchema, 'Access Token Response');
 ❌ Import Secrets in tests → Use TestDataProvider instead
 ❌ **Explanatory comments in tests** → Let code be self-documenting
 ❌ **Throwing errors in utility functions** → Return undefined/null instead
-❌ **Direct expect() in Page Objects** → Use BasePage assertion methods (toHaveTitle, toBeVisible, etc.)
-❌ **Missing JSDoc on Page Object methods** → All public methods must have JSDoc comments
+❌ **Direct expect() in Page Objects** → Use BasePage assertion methods (elementToContainText, elementToBeVisible, etc.)
+❌ **Duplicate locators for same element** → ONE verified locator per element
+❌ **Unused locators or methods** → Remove unused code immediately
+❌ **Steps reading secrets internally** → Accept credentials as parameters, read secrets at test level
+❌ **Missing JSDoc on complex Page Object methods** → Methods with non-obvious behavior must have JSDoc comments (simple self-documenting methods like `clickLogin()` may omit JSDoc)
 ❌ **Magic values in Page Objects** → Store Page Object-specific constants at top of file (page titles, specific text values)
 ❌ **Examples in utils documentation** → Use simple descriptions only, no `@example` blocks
 ❌ **Missing @param/@returns in utils docs** → All utils functions must have `@param` and `@returns` tags
@@ -705,6 +737,7 @@ await assertSchema(response, AccessTokenSchema, 'Access Token Response');
 ❌ **Unused imports** → Remove all unused imports immediately
 ❌ **Relative imports when alias exists** → Use path aliases (`@utils/config` not `../../utils/config`)
 ❌ **Missing barrel exports** → All new modules must be exported from their `index.ts`
+❌ **Redundant visibility checks before actions** → Playwright's `fill()`, `click()`, and other action methods already wait for visibility. Only use `elementToBeVisible()` before verification methods (assertions) or text retrieval.
 
 ---
 

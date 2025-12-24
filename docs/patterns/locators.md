@@ -208,7 +208,6 @@ export class WikipediaLoginPage extends BasePage {
      * Enter username
      */
     async enterUsername(username: string): Promise<void> {
-        await this.elementToBeVisible(this.usernameInput);
         await this.usernameInput.fill(username);
     }
 }

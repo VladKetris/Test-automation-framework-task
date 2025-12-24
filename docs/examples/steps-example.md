@@ -43,10 +43,10 @@ export class WikipediaLoginSteps {
     /**
      * Enter username and password
      */
-    @step('Enter Username "{0}" and Password')
-    async enterCredentials(username: string, password: string): Promise<void> {
-        await this.loginPage.enterUsername(username);
-        await this.loginPage.enterPassword(password);
+    @step('Enter Username and Password')
+    async enterCredentials(credentials: { username: string; password: string }): Promise<void> {
+        await this.loginPage.enterUsername(credentials.username);
+        await this.loginPage.enterPassword(credentials.password);
     }
 
     /**
@@ -60,9 +60,9 @@ export class WikipediaLoginSteps {
     /**
      * Perform complete login flow
      */
-    @step('Login to Wikipedia with "{0}"')
-    async login(username: string, password: string): Promise<void> {
-        await this.enterCredentials(username, password);
+    @step('Login to Wikipedia')
+    async login(credentials: { username: string; password: string }): Promise<void> {
+        await this.enterCredentials(credentials);
         await this.clickLoginButton();
     }
 
@@ -99,13 +99,11 @@ test.describe('Wikipedia Login Tests', () => {
         wikipediaLoginSteps,
         wikipediaMainPage
     }) => {
-        const { username, password } = getWikipediaCredentials();
-        
         await wikipediaMainPage.navigate();
         await wikipediaLoginSteps.navigateToLogin();
         await wikipediaLoginSteps.verifyPageOpened();
-        await wikipediaLoginSteps.login(username, password);
-        await wikipediaLoginSteps.verifyLoggedIn(username);
+        await wikipediaLoginSteps.login(getWikipediaCredentials());
+        await wikipediaLoginSteps.verifyLoggedIn(getWikipediaCredentials().username);
     });
 
     test('Login with invalid credentials shows error', async ({ 
@@ -114,7 +112,7 @@ test.describe('Wikipedia Login Tests', () => {
     }) => {
         await wikipediaMainPage.navigate();
         await wikipediaLoginSteps.navigateToLogin();
-        await wikipediaLoginSteps.login('invalid_user', 'wrong_password');
+        await wikipediaLoginSteps.login({ username: 'invalid_user', password: 'wrong_password' });
         // Verify error message displayed
     });
 });
@@ -228,18 +226,31 @@ export class WikipediaAuthSteps {
 
 ## Anti-Patterns to Avoid
 
-### ❌ Hardcoded or Environment-Read Data
+### ❌ Reading Secrets Inside Steps
 
 ```typescript
 // ❌ BAD: Reading secrets inside Steps
-@step('Login')
-async login(): Promise<void> {
-    const username = process.env.USERNAME;
-    const password = 'hardcoded123';
-    
+import { getWikipediaCredentials } from '@utils/secrets';
+
+@step('Authenticate user')
+async authenticateUser(): Promise<void> {
+    const { username, password } = getWikipediaCredentials();  // DON'T DO THIS
     await this.loginPage.enterUsername(username);
     await this.loginPage.enterPassword(password);
 }
+
+// ✅ GOOD: Accept credentials as parameters
+@step('Authenticate user "{0}"')
+async authenticateUser(username: string, password: string): Promise<void> {
+    await this.loginPage.enterUsername(username);
+    await this.loginPage.enterPassword(password);
+}
+```
+
+**Usage in tests:**
+```typescript
+// Tests pass credentials object directly to Steps
+await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
 ```
 
 ### ❌ Creating Page Objects Inside Steps
@@ -250,9 +261,9 @@ export class BadLoginSteps {
     constructor(private readonly page: Page) {}
 
     @step('Login')
-    async login(username: string, password: string): Promise<void> {
+    async login(credentials: { username: string; password: string }): Promise<void> {
         const loginPage = new WikipediaLoginPage(this.page);  // DON'T DO THIS
-        await loginPage.enterUsername(username);
+        await loginPage.enterUsername(credentials.username);
     }
 }
 ```
@@ -261,9 +272,9 @@ export class BadLoginSteps {
 
 ```typescript
 // ❌ BAD: Missing decorator - won't appear in reports
-async login(username: string, password: string): Promise<void> {
-    await this.loginPage.enterUsername(username);
-    await this.loginPage.enterPassword(password);
+async login(credentials: { username: string; password: string }): Promise<void> {
+    await this.loginPage.enterUsername(credentials.username);
+    await this.loginPage.enterPassword(credentials.password);
 }
 ```
 
@@ -272,7 +283,7 @@ async login(username: string, password: string): Promise<void> {
 ```typescript
 // ❌ BAD: No JSDoc
 @step('Login')
-async login(username: string, password: string): Promise<void> {
+async login(credentials: { username: string; password: string }): Promise<void> {
     // ...
 }
 
@@ -280,8 +291,8 @@ async login(username: string, password: string): Promise<void> {
 /**
  * Perform login with credentials
  */
-@step('Login with "{0}"')
-async login(username: string, password: string): Promise<void> {
+@step('Login to Wikipedia')
+async login(credentials: { username: string; password: string }): Promise<void> {
     // ...
 }
 ```
@@ -294,10 +305,11 @@ async login(username: string, password: string): Promise<void> {
 |----------|-------------|
 | `private readonly` | Constructor parameters with proper visibility |
 | `@step` decorator | On ALL public methods |
-| JSDoc comments | On ALL public methods |
-| Parameters | Accept data as method parameters |
+| JSDoc comments | On methods with non-obvious behavior |
+| Parameters | Accept data (including credentials) as method parameters |
 | DI pattern | Receive Page Objects via constructor |
 | Composite methods | Combine frequently-used action sequences |
+| No internal secrets | Never read secrets inside Steps |
 
 ---
 

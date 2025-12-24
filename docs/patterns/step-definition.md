@@ -26,10 +26,10 @@ export class WikipediaLoginSteps {
     /**
      * Perform login with credentials
      */
-    @step('Login with "{0}"')
-    async login(username: string, password: string): Promise<void> {
-        await this.loginPage.enterUsername(username);
-        await this.loginPage.enterPassword(password);
+    @step('Login to Wikipedia')
+    async login(credentials: { username: string; password: string }): Promise<void> {
+        await this.loginPage.enterUsername(credentials.username);
+        await this.loginPage.enterPassword(credentials.password);
         await this.loginPage.clickLogin();
     }
 }
@@ -58,10 +58,10 @@ export class WikipediaLoginSteps {
     /**
      * Perform login with credentials
      */
-    @step('Login to Wikipedia with "{0}"')
-    async login(username: string, password: string): Promise<void> {
-        await this.loginPage.enterUsername(username);
-        await this.loginPage.enterPassword(password);
+    @step('Login to Wikipedia')
+    async login(credentials: { username: string; password: string }): Promise<void> {
+        await this.loginPage.enterUsername(credentials.username);
+        await this.loginPage.enterPassword(credentials.password);
         await this.loginPage.clickLogin();
     }
 }
@@ -89,11 +89,13 @@ export const test = apiTest.extend<StepsFixtures>({
 |------|--------|
 | ✅ `private readonly` for PO | Proper encapsulation |
 | ✅ `@step` decorator on ALL methods | Clear reporting in HTML report |
-| ✅ JSDoc on ALL methods | Documentation standard |
+| ✅ JSDoc on complex methods | Documentation for non-obvious behavior |
 | ✅ Accept data as parameters | Reusability across scenarios |
+| ✅ Accept credentials as parameters | Never read secrets internally |
 | ❌ No locators in Steps | Maintainability (keep in PO) |
 | ❌ No `new PageObject()` | Violation of DI pattern |
 | ❌ No hardcoded data | Flexibility for different test cases |
+| ❌ No reading secrets internally | Tests pass credentials to Steps |
 
 ---
 

@@ -25,17 +25,14 @@ export class WikipediaLoginPage extends BasePage {
     // Atomic Actions
 
     async enterUsername(username: string): Promise<void> {
-        await this.elementToBeVisible(this.usernameInput);
         await this.usernameInput.fill(username);
     }
 
     async enterPassword(password: string): Promise<void> {
-        await this.elementToBeVisible(this.passwordInput);
         await this.passwordInput.fill(password);
     }
 
     async clickLogin(): Promise<void> {
-        await this.elementToBeVisible(this.loginButton);
         await this.loginButton.click();
     }
 }

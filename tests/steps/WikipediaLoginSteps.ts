@@ -12,10 +12,10 @@ export class WikipediaLoginSteps {
         await this.loginPage.verifyLoginPageTitle();
     }
 
-    @step('Enter Username "{0}" and Password on the Login Page')
-    async enterCredentials(username: string, password: string): Promise<void> {
-        await this.loginPage.enterUsername(username);
-        await this.loginPage.enterPassword(password);
+    @step('Enter Username and Password on the Login Page')
+    async enterCredentials(credentials: { username: string; password: string }): Promise<void> {
+        await this.loginPage.enterUsername(credentials.username);
+        await this.loginPage.enterPassword(credentials.password);
     }
 
     @step('Click "Log in" on the Login Page')
@@ -23,9 +23,9 @@ export class WikipediaLoginSteps {
         await this.loginPage.clickLogin();
     }
 
-    @step('Login to Wikipedia with "{0}"')
-    async login(username: string, password: string): Promise<void> {
-        await this.enterCredentials(username, password);
+    @step('Login to Wikipedia')
+    async login(credentials: { username: string; password: string }): Promise<void> {
+        await this.enterCredentials(credentials);
         await this.clickLoginButton();
     }
 }

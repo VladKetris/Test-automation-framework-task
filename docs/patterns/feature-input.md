@@ -108,6 +108,7 @@ test('Test 01: Create account successfully',
 });
 ```
 
+
 ## Best Practices
 
 1. **One scenario = One test** - Each scenario becomes a separate `test()` in Playwright
