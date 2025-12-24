@@ -18,12 +18,10 @@ export class WikipediaVisualEditorPage extends BasePage {
     }
 
     async verifyHeadingContains(expectedTitle: string): Promise<void> {
-        await this.elementToBeVisible(this.heading);
         await this.elementToContainText(this.heading, expectedTitle);
     }
 
     async verifyPublishButtonDisabled(): Promise<void> {
-        await this.elementToBeVisible(this.publishButton);
         await this.elementToBeDisabled(this.publishButton);
     }
 

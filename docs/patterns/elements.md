@@ -270,26 +270,30 @@ await this.elementToContainText(this.errorMessage, 'Invalid');
 ### When to Use elementToBeVisible()
 
 **✅ Use `elementToBeVisible()` for:**
-- Verification methods (assertions) - before `elementToHaveText()`, `elementToContainText()`, etc.
-- Before retrieving text content - when calling `innerText()`, `textContent()`, etc.
-- State verification - when you need to explicitly verify visibility as part of test logic
+- Explicit visibility verification - when you need to verify visibility as a separate assertion in your test logic
+- State checks - when visibility itself is what you're testing (e.g., "verify error message is visible")
 
 **❌ Don't use `elementToBeVisible()` before:**
 - Action methods like `fill()`, `click()`, `hover()`, `selectOption()` - these already wait for visibility automatically
-- Playwright's built-in auto-waiting handles visibility checks for all action methods
+- Assertion methods like `elementToHaveText()`, `elementToContainText()`, `elementToHaveValue()` - these already wait for visibility automatically
+- Text retrieval methods like `innerText()`, `textContent()` - these already wait for visibility automatically
+- Playwright's built-in auto-waiting handles visibility checks for all action and assertion methods
 
 **Examples:**
 
 ```typescript
-// ✅ GOOD: Use elementToBeVisible before verification
-async verifyErrorDisplayed(expectedError: string): Promise<void> {
+// ✅ GOOD: Explicit visibility verification (visibility is what we're testing)
+async verifyErrorDisplayed(): Promise<void> {
     await this.elementToBeVisible(this.errorMessage);
+}
+
+// ✅ GOOD: Direct text verification - elementToHaveText() already waits for visibility
+async verifyErrorText(expectedError: string): Promise<void> {
     await this.elementToHaveText(this.errorMessage, expectedError);
 }
 
-// ✅ GOOD: Use elementToBeVisible before retrieving text
+// ✅ GOOD: Direct text retrieval - innerText() already waits for visibility
 async getArticleTitle(): Promise<string> {
-    await this.elementToBeVisible(this.articleTitle);
     return this.articleTitle.innerText();
 }
 
@@ -313,6 +317,28 @@ async clickLogin(): Promise<void> {
 // ✅ GOOD: Direct action - click() already waits for visibility
 async clickLogin(): Promise<void> {
     await this.submitButton.click();
+}
+
+// ❌ BAD: Redundant visibility check before elementToHaveText()
+async verifyErrorDisplayed(expectedError: string): Promise<void> {
+    await this.elementToBeVisible(this.errorMessage);  // ❌ Redundant
+    await this.elementToHaveText(this.errorMessage, expectedError);
+}
+
+// ✅ GOOD: Direct assertion - elementToHaveText() already waits for visibility
+async verifyErrorDisplayed(expectedError: string): Promise<void> {
+    await this.elementToHaveText(this.errorMessage, expectedError);
+}
+
+// ❌ BAD: Redundant visibility check before innerText()
+async getArticleTitle(): Promise<string> {
+    await this.elementToBeVisible(this.articleTitle);  // ❌ Redundant
+    return this.articleTitle.innerText();
+}
+
+// ✅ GOOD: Direct text retrieval - innerText() already waits for visibility
+async getArticleTitle(): Promise<string> {
+    return this.articleTitle.innerText();
 }
 ```
 

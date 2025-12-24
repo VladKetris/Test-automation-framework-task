@@ -245,7 +245,6 @@ export class PageName extends BasePage {
      * Get message text
      */
     async getMessageText(): Promise<string> {
-        await this.elementToBeVisible(this.messageLabel);
         const text = await this.messageLabel.textContent();
         return text || "";
     }

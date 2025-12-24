@@ -20,12 +20,10 @@ export class WikipediaArticlePage extends BasePage {
     }
 
     async verifyArticleTitle(expectedTitle: string): Promise<void> {
-        await this.elementToBeVisible(this.articleTitle);
         await this.elementToHaveText(this.articleTitle, expectedTitle);
     }
 
     async verifyArticleContainsText(expectedText: string): Promise<void> {
-        await this.elementToBeVisible(this.articleContent);
         await this.elementToContainText(this.articleContent, expectedText);
     }
 
@@ -36,17 +34,14 @@ export class WikipediaArticlePage extends BasePage {
      */
     async verifyParagraphContainsText(expectedText: string, index: number = 0): Promise<void> {
         const paragraph = this.paragraphs(index);
-        await this.elementToBeVisible(paragraph);
         await this.elementToContainText(paragraph, expectedText);
     }
 
     async getArticleTitle(): Promise<string> {
-        await this.elementToBeVisible(this.articleTitle);
         return this.articleTitle.innerText();
     }
 
     async getArticleContent(): Promise<string> {
-        await this.elementToBeVisible(this.articleContent);
         return this.articleContent.innerText();
     }
 
