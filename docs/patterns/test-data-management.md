@@ -507,11 +507,8 @@ WIKI_META_CLIENT_SECRET=your_client_secret
 
 **Example - Correct Pattern:**
 ```typescript
-// In test file - read secrets here
-const { username, password } = getWikipediaCredentials();
-
-// Pass to Steps as parameters
-await wikipediaAuthSteps.authenticateUser(username, password);
+// In test file - pass credentials object directly to Steps
+await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
 ```
 
 **Example - Anti-Pattern:**

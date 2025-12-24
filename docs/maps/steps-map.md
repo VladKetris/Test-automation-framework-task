@@ -30,9 +30,9 @@
 | Method | Parameters | Description | Composite? |
 |--------|------------|-------------|------------|
 | verifyPageOpened() | - | Verify login page loaded (incl. title) | ❌ |
-| enterCredentials() | username: string, password: string | Enter username + password | ✅ |
+| enterCredentials() | credentials: { username: string; password: string } | Enter username + password | ✅ |
 | clickLoginButton() | - | Click login button | ❌ |
-| login() | username: string, password: string | Full login flow | ✅ |
+| login() | credentials: { username: string; password: string } | Full login flow | ✅ |
 
 ---
 
@@ -53,12 +53,11 @@
 
 | Method | Parameters | Description | Composite? |
 |--------|------------|-------------|------------|
-| authenticateUser() | username: string, password: string | Authenticate user via UI login flow (open main page, click login, enter credentials, login) | ✅ |
+| authenticateUser() | credentials: { username: string; password: string } | Authenticate user via UI login flow (open main page, click login, enter credentials, login) | ✅ |
 
 **Usage:**
 ```typescript
-const { username, password } = getWikipediaCredentials();
-await wikipediaAuthSteps.authenticateUser(username, password);
+await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
 ```
 
 **Note:** Credentials must be passed as parameters (never read internally). Tests get credentials from `getWikipediaCredentials()` in `@utils/secrets`.
@@ -117,7 +116,7 @@ await wikipediaMainSteps.openDirectlyAndVerify();
 await wikipediaNavigationMenu.clickLogIn();
 
 // Steps for business action (enter credentials + click login)
-await wikipediaLoginSteps.login(username, password);
+await wikipediaLoginSteps.login(getWikipediaCredentials());
 
 // PO for atomic verification
 await wikipediaMainPage.verifyPageOpened();
@@ -125,8 +124,7 @@ await wikipediaMainPage.verifyPageOpened();
 
 ### Composite Authentication (Single Step)
 ```typescript
-const { username, password } = getWikipediaCredentials();
-await wikipediaAuthSteps.authenticateUser(username, password);
+await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
 ```
 
 ### Navigate to Main Page
@@ -152,11 +150,8 @@ test('Edit article', async ({
     wikipediaArticlePage,
     wikipediaArticleEditSteps
 }) => {
-    // Read credentials at test level
-    const { username, password } = getWikipediaCredentials();
-    
-    // Pass to Steps as parameters
-    await wikipediaAuthSteps.authenticateUser(username, password);
+    // Authenticate user via Steps (credentials passed as object)
+    await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
     
     // Continue with authenticated actions
     await wikipediaArticlePage.clickEdit();

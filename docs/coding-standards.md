@@ -462,7 +462,7 @@ public getRandomArticle(): string {
 **Rule:** For tests requiring authentication, use Steps with credentials passed as parameters.
 
 - **Read credentials at test level**: Use `getWikipediaCredentials()` from `@utils/secrets`
-- **Pass to Steps**: Call `wikipediaAuthSteps.authenticateUser(username, password)`
+- **Pass to Steps**: Call `wikipediaAuthSteps.authenticateUser(getWikipediaCredentials())`
 - **Never read secrets inside Steps**: Steps accept credentials as parameters
 
 **Example:**
@@ -474,8 +474,7 @@ test('Edit article', async ({
     wikipediaArticlePage,
     wikipediaArticleEditSteps
 }) => {
-    const { username, password } = getWikipediaCredentials();
-    await wikipediaAuthSteps.authenticateUser(username, password);
+    await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
     
     await wikipediaArticlePage.clickEdit();
     await wikipediaArticleEditSteps.editContentAndPublish('New content');

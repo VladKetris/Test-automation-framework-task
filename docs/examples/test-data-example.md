@@ -212,12 +212,11 @@ test.describe('Wikipedia Login and Search', () => {
         wikipediaLoginSteps,
         wikipediaNavigationMenu
     }) => {
-        const { username, password } = getWikipediaCredentials();
         const articleTitle = getRandomArticle();
 
         await wikipediaMainPage.navigate();
         await wikipediaLoginSteps.navigateToLogin();
-        await wikipediaLoginSteps.login(username, password);
+        await wikipediaLoginSteps.login(getWikipediaCredentials());
         await wikipediaNavigationMenu.enterSearchText(articleTitle);
         await wikipediaNavigationMenu.clickSearch();
     });

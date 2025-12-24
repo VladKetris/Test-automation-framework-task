@@ -64,10 +64,10 @@ export class WikipediaLoginSteps {
     /**
      * Perform login with credentials
      */
-    @step('Login with username: {0}')
-    async login(username: string, password: string): Promise<void> {
-        await this.loginPage.enterUsername(username);
-        await this.loginPage.enterPassword(password);
+    @step('Login to Wikipedia')
+    async login(credentials: { username: string; password: string }): Promise<void> {
+        await this.loginPage.enterUsername(credentials.username);
+        await this.loginPage.enterPassword(credentials.password);
         await this.loginPage.clickLogin();
     }
 

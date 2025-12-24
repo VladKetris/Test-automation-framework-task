@@ -30,7 +30,7 @@ type StepsFixtures = {
  * 
  * test('login flow', async ({ wikipediaLoginSteps, wikipediaNavigationMenu }) => {
  *     await wikipediaNavigationMenu.clickLogIn();  // PO for atomic action
- *     await wikipediaLoginSteps.login('user', 'pass');  // Steps for business logic
+ *     await wikipediaLoginSteps.login({ username: 'user', password: 'pass' });  // Steps for business logic
  * });
  */
 export const test = apiTest.extend<StepsFixtures>({

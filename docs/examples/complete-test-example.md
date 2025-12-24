@@ -181,11 +181,8 @@ test.describe('Wikipedia Authenticated Features', () => {
         wikipediaArticleCreateSteps,
         wikipediaVisualEditorPage
     }) => {
-        // Get credentials at test level
-        const { username, password } = getWikipediaCredentials();
-        
-        // Authenticate user via Steps (credentials passed as parameters)
-        await wikipediaAuthSteps.authenticateUser(username, password);
+        // Authenticate user via Steps (credentials passed as object)
+        await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
         
         // Continue with authenticated actions
         await wikipediaArticleCreateSteps.navigateToCreateNewPage();

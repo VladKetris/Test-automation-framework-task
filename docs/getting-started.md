@@ -139,7 +139,7 @@ Playwright API
 | Layer | Location | Purpose | Example |
 |-------|----------|---------|---------|
 | **Test** | `tests/specs/*.spec.ts` | Test scenarios, orchestration | `test('login', async ({ loginSteps }) => {...})` |
-| **Steps** | `tests/steps/*Steps.ts` | Business-level actions | `loginSteps.login(username, password)` |
+| **Steps** | `tests/steps/*Steps.ts` | Business-level actions | `loginSteps.login(getWikipediaCredentials())` |
 | **Page Objects** | `tests/pages/*Page.ts` | Atomic UI actions | `loginPage.fillUsername(username)` |
 | **API** | `tests/api/*` | API services, routes, schemas | `SearchService.search(query)` |
 

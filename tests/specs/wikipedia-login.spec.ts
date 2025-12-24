@@ -13,8 +13,7 @@ test.describe('Wikipedia Login Tests', () => {
 
         await wikipediaNavigationMenu.clickLogIn();
 
-        const { username, password } = getWikipediaCredentials();
-        await wikipediaLoginSteps.login(username, password);
+        await wikipediaLoginSteps.login(getWikipediaCredentials());
 
         await wikipediaMainPage.verifyPageOpened();
     });

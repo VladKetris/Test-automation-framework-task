@@ -11,8 +11,7 @@ test.describe('Wikipedia Edit Existing Article (VisualEditor)', () => {
         wikipediaArticleEditSteps,
         wikipediaArticlePage
     }) => {
-        const { username, password } = getWikipediaCredentials();
-        await wikipediaAuthSteps.authenticateUser(username, password);
+        await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
 
         const articleTitle = getEditableArticle();
         const newContent = randomSentence();

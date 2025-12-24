@@ -12,12 +12,12 @@ export class WikipediaAuthSteps {
         private readonly mainPage: WikipediaMainPage
     ) {}
 
-    @step('Authenticate user "{0}" via UI login flow')
-    async authenticateUser(username: string, password: string): Promise<void> {
+    @step('Authenticate user via UI login flow')
+    async authenticateUser(credentials: { username: string; password: string }): Promise<void> {
         await this.mainSteps.openDirectlyAndVerify();
         await this.navigationMenu.clickLogIn();
         await this.loginSteps.verifyPageOpened();
-        await this.loginSteps.login(username, password);
+        await this.loginSteps.login(credentials);
         await this.mainPage.verifyPageOpened();
     }
 }

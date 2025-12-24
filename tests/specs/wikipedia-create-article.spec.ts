@@ -11,8 +11,7 @@ test.describe('Wikipedia Create New Article (VisualEditor)', () => {
         wikipediaArticleEditSteps,
         wikipediaArticlePage
     }) => {
-        const { username, password } = getWikipediaCredentials();
-        await wikipediaAuthSteps.authenticateUser(username, password);
+        await wikipediaAuthSteps.authenticateUser(getWikipediaCredentials());
 
         const { pageTitle, headerTitle } = createArticleTitle();
         const content = randomSentence();
