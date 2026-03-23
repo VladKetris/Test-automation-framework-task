@@ -6,6 +6,8 @@ export class WikipediaArticlePage extends BasePage {
     private readonly articleContent: Locator;
     private readonly paragraphs: (index: number) => Locator;
     private readonly editButton: Locator;
+    private readonly watchButton: Locator;
+    private readonly unwatchButton: Locator;
 
     constructor(page: Page) {
         super(
@@ -17,6 +19,8 @@ export class WikipediaArticlePage extends BasePage {
         this.articleContent = page.locator('#mw-content-text').describe('Article content container');
         this.paragraphs = (index: number) => page.locator('#mw-content-text .mw-parser-output > p').nth(index).describe('Article paragraphs');
         this.editButton = page.locator('#ca-edit a').describe('Edit button');
+        this.watchButton = page.locator('#ca-watch a').describe('Watch button');
+        this.unwatchButton = page.locator('#ca-unwatch a').describe('Unwatch button');
     }
 
     async verifyArticleTitle(expectedTitle: string): Promise<void> {
@@ -48,5 +52,30 @@ export class WikipediaArticlePage extends BasePage {
     async clickEdit(): Promise<void> {
         await this.editButton.click();
     }
-}
 
+    async clickWatch(): Promise<void> {
+        await this.watchButton.click();
+    }
+
+    async clickUnwatch(): Promise<void> {
+        await this.unwatchButton.click();
+    }
+
+    async verifyWatchButtonDisplayed(): Promise<void> {
+        await this.elementToBeVisible(this.watchButton);
+        await this.elementToHaveText(this.watchButton, 'Watch');
+    }
+
+    async verifyUnwatchButtonDisplayed(): Promise<void> {
+        await this.elementToBeVisible(this.unwatchButton);
+        await this.elementToHaveText(this.unwatchButton, 'Unwatch');
+    }
+
+    async isWatchButtonVisible(): Promise<boolean> {
+        return this.watchButton.isVisible();
+    }
+
+    async isUnwatchButtonVisible(): Promise<boolean> {
+        return this.unwatchButton.isVisible();
+    }
+}
