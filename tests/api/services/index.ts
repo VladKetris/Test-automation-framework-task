@@ -1,3 +1,4 @@
 export { SearchService } from './SearchService';
 export { PageService } from './PageService';
 export { AuthService } from './AuthService';
+export { TestService } from './TestService';

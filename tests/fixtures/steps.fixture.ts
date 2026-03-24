@@ -7,7 +7,12 @@ import {
     WikipediaSearchSteps,
     WikipediaArticleEditSteps,
     WikipediaArticleCreateSteps,
-    WikipediaWatchlistSteps
+    WikipediaWatchlistSteps,
+    TestMainSteps,
+    TestAddedToCartPopupSteps,
+    TestLoginSteps,
+    TestProductsSteps,
+    TestViewCartSteps,
 } from '@steps';
 import { WikipediaAuthSteps } from '@steps/WikipediaAuthSteps';
 
@@ -22,6 +27,11 @@ type StepsFixtures = {
     wikipediaArticleCreateSteps: WikipediaArticleCreateSteps;
     wikipediaAuthSteps: WikipediaAuthSteps;
     wikipediaWatchlistSteps: WikipediaWatchlistSteps;
+    testMainSteps: TestMainSteps;
+    testAddedToCartPopupSteps: TestAddedToCartPopupSteps;
+    testLoginSteps: TestLoginSteps;
+    testProductsSteps: TestProductsSteps;
+    testViewCartSteps: TestViewCartSteps;
 };
 
 /**
@@ -63,6 +73,26 @@ export const test = apiTest.extend<StepsFixtures>({
 
     wikipediaWatchlistSteps: async ({ wikipediaArticlePage, wikipediaWatchlistConfirmationPopupPage }, use) => {
         await use(new WikipediaWatchlistSteps(wikipediaArticlePage, wikipediaWatchlistConfirmationPopupPage));
+    },
+
+    testMainSteps: async ({ testMainPage }, use) => {
+        await use(new TestMainSteps(testMainPage));
+    },
+
+    testAddedToCartPopupSteps: async ({ testAddedToCardPopupPage }, use) => {
+        await use(new TestAddedToCartPopupSteps(testAddedToCardPopupPage));
+    },
+
+    testLoginSteps: async ({ testLoginPage }, use) => {
+        await use(new TestLoginSteps(testLoginPage));
+    },
+
+    testProductsSteps: async ({ testProductsPage }, use) => {
+        await use(new TestProductsSteps(testProductsPage));
+    },
+
+    testViewCartSteps: async ({ testViewCartPage }, use) => {
+        await use(new TestViewCartSteps(testViewCartPage));
     },
 });
 

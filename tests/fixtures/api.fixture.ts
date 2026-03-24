@@ -1,8 +1,8 @@
 import { test as pagesTest } from './pages.fixture';
 import { ApiClient } from '@utils/api-client';
-import { SearchService, AuthService, PageService } from '@api/services';
-import { WikipediaAuthApiSteps } from '@api-steps';
-import { getEnvironment } from '@utils/config';
+import { SearchService, AuthService, PageService, TestService } from '@api/services';
+import { TestApiSteps, WikipediaAuthApiSteps } from '@api-steps';
+import { getEnvironment, getTestEnvironment } from '@utils/config';
 
 /**
  * API Fixture Types
@@ -10,13 +10,17 @@ import { getEnvironment } from '@utils/config';
 type ApiFixtures = {
     /** Core client for ad-hoc API calls (uses baseUrl) */
     apiClient: ApiClient;
+    testApiClient: ApiClient;
 
     /** Search service for Wikipedia Search API (uses apiUrl) */
     searchService: SearchService;
-
+    
     authService: AuthService;
     pageService: PageService;
     wikipediaAuthApiSteps: WikipediaAuthApiSteps;
+
+    testService: TestService;
+    testApiSteps: TestApiSteps;
 };
 
 /**
@@ -62,5 +66,20 @@ export const test = pagesTest.extend<ApiFixtures>({
 
     wikipediaAuthApiSteps: async ({ authService }, use) => {
         await use(new WikipediaAuthApiSteps(authService));
+    },
+
+    testApiClient: async ({ request }, use) => {
+        const env = getTestEnvironment();
+        await use(new ApiClient(request, env.baseUrl));
+    },
+
+
+    testService: async ({ request }, use) => {
+        const env = getTestEnvironment();
+        await use(new TestService(new ApiClient(request, env.api.apiUrl)));
+    },
+
+    testApiSteps: async ({ testService }, use) => {
+        await use(new TestApiSteps(testService));
     },
 });

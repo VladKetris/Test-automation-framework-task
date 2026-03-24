@@ -28,6 +28,8 @@
             "@api-steps/*": ["tests/api-steps/*"],
             "@fixtures": ["tests/fixtures"],
             "@fixtures/*": ["tests/fixtures/*"],
+            "@sharedTypes": ["tests/types"],
+            "@sharedTypes/*": ["tests/types/*"],
             "@utils/*": ["utils/*"],
             "@data/*": ["tests/data/*"]
         }

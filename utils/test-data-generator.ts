@@ -1,3 +1,4 @@
+import { CreateTestUserPayload } from '@api/schemas/TestSchema';
 import { faker } from '@faker-js/faker';
 
 /**
@@ -212,3 +213,25 @@ export function randomEditSummary(prefix: string = 'Automated test'): string {
     return `${prefix} ${randomString()}`;
 }
 
+/**
+ * Generate random user
+ * @returns Random user
+ */
+export function generateRandomUser(): CreateTestUserPayload {
+  return {
+    name: faker.person.fullName(),
+    email: Date.now() + faker.internet.email(),
+    title: '',
+    firstname: faker.person.firstName(),
+    lastname: faker.person.lastName(),
+    company: faker.company.name(),
+    address1: faker.location.street(),
+    address2: '',
+    country: faker.location.country(),
+    state: faker.location.state(),
+    city: faker.location.city(),
+    zipcode: faker.location.zipCode(),
+    password: faker.internet.password(),
+    mobile_number: faker.phone.number(),
+  };
+}
