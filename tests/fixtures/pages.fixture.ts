@@ -14,7 +14,13 @@ import {
     WikipediaCreatePagePage,
     WikipediaVisualEditorPage,
     WikipediaSaveChangesDialogPage,
-    WikipediaWatchlistConfirmationPopupPage
+    WikipediaWatchlistConfirmationPopupPage,
+    TestMainPage,
+    TestNavigationMenuPage,
+    TestLoginPage,
+    TestProductsPage,
+    TestAddedToCartPopupPage,
+    TestViewCartPage,
 } from '@pages';
 
 /**
@@ -30,6 +36,12 @@ type PagesFixtures = {
     wikipediaVisualEditorPage: WikipediaVisualEditorPage;
     wikipediaSaveChangesDialogPage: WikipediaSaveChangesDialogPage;
     wikipediaWatchlistConfirmationPopupPage: WikipediaWatchlistConfirmationPopupPage;
+    testMainPage: TestMainPage;
+    testNavigationMenuPage: TestNavigationMenuPage;
+    testLoginPage: TestLoginPage;
+    testProductsPage: TestProductsPage;
+    testAddedToCardPopupPage: TestAddedToCartPopupPage;
+    testViewCartPage: TestViewCartPage;
 };
 
 
@@ -74,4 +86,27 @@ export const test = base.extend<AllPagesFixtures>({
         await use(new WikipediaWatchlistConfirmationPopupPage(page));
     },
 
+    testMainPage: async ({ page }, use) => {
+        await use(new TestMainPage(page));
+    },
+
+    testNavigationMenuPage: async ({ page }, use) => {
+        await use(new TestNavigationMenuPage(page));
+    },
+
+    testLoginPage: async ({ page }, use) => {
+        await use(new TestLoginPage(page));
+    },
+
+    testProductsPage: async ({ page }, use) => {
+        await use(new TestProductsPage(page));
+    },
+
+    testAddedToCardPopupPage: async ({ page }, use) => {
+        await use(new TestAddedToCartPopupPage(page));
+    },
+
+    testViewCartPage: async ({ page }, use) => {
+        await use(new TestViewCartPage(page));
+    },
 });

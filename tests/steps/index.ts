@@ -5,3 +5,8 @@ export * from './WikipediaLoginSteps';
 export * from './WikipediaMainSteps';
 export * from './WikipediaSearchSteps';
 export * from './WikipediaWatchlistSteps';
+export * from './TestMainSteps';
+export * from './TestAddedToCartPopupSteps';
+export * from './TestLoginSteps';
+export * from './TestProductsSteps';
+export * from './TestViewCartSteps';

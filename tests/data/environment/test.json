@@ -1,0 +1,21 @@
+{
+    "environment": "dev",
+    "baseUrl": "https://www.automationexercise.com/",
+    "api": {
+        "apiUrl": "https://automationexercise.com/api/"
+    },
+    "testSite": {
+        "landingUrl": "https://www.automationexercise.com",
+        "mainPageUrl": "https://www.automationexercise.com"
+    },
+    "timeouts": {
+        "navigation": 10000,
+        "action": 5000,
+        "assertion": 10000,
+        "defaultDelay": 2000,
+        "explicitWait": 10000,
+        "loaderAppear": 1000,
+        "loaderDisappear": 10000,
+        "pageLoad": 15000
+    }
+}
