@@ -13,7 +13,8 @@ import {
     WikipediaDonatePage,
     WikipediaCreatePagePage,
     WikipediaVisualEditorPage,
-    WikipediaSaveChangesDialogPage
+    WikipediaSaveChangesDialogPage,
+    WikipediaWatchlistConfirmationPopupPage
 } from '@pages';
 
 /**
@@ -28,6 +29,7 @@ type PagesFixtures = {
     wikipediaCreatePagePage: WikipediaCreatePagePage;
     wikipediaVisualEditorPage: WikipediaVisualEditorPage;
     wikipediaSaveChangesDialogPage: WikipediaSaveChangesDialogPage;
+    wikipediaWatchlistConfirmationPopupPage: WikipediaWatchlistConfirmationPopupPage;
 };
 
 
@@ -66,6 +68,10 @@ export const test = base.extend<AllPagesFixtures>({
 
     wikipediaSaveChangesDialogPage: async ({ page }, use) => {
         await use(new WikipediaSaveChangesDialogPage(page));
+    },
+
+    wikipediaWatchlistConfirmationPopupPage: async ({ page }, use) => {
+        await use(new WikipediaWatchlistConfirmationPopupPage(page));
     },
 
 });

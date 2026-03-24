@@ -6,7 +6,8 @@ import {
     WikipediaLoginSteps,
     WikipediaSearchSteps,
     WikipediaArticleEditSteps,
-    WikipediaArticleCreateSteps
+    WikipediaArticleCreateSteps,
+    WikipediaWatchlistSteps
 } from '@steps';
 import { WikipediaAuthSteps } from '@steps/WikipediaAuthSteps';
 
@@ -20,6 +21,7 @@ type StepsFixtures = {
     wikipediaArticleEditSteps: WikipediaArticleEditSteps;
     wikipediaArticleCreateSteps: WikipediaArticleCreateSteps;
     wikipediaAuthSteps: WikipediaAuthSteps;
+    wikipediaWatchlistSteps: WikipediaWatchlistSteps;
 };
 
 /**
@@ -57,6 +59,10 @@ export const test = apiTest.extend<StepsFixtures>({
 
     wikipediaAuthSteps: async ({ wikipediaMainSteps, wikipediaNavigationMenu, wikipediaLoginSteps, wikipediaMainPage }, use) => {
         await use(new WikipediaAuthSteps(wikipediaMainSteps, wikipediaNavigationMenu, wikipediaLoginSteps, wikipediaMainPage));
+    },
+
+    wikipediaWatchlistSteps: async ({ wikipediaArticlePage, wikipediaWatchlistConfirmationPopupPage }, use) => {
+        await use(new WikipediaWatchlistSteps(wikipediaArticlePage, wikipediaWatchlistConfirmationPopupPage));
     },
 });
 

@@ -7,3 +7,4 @@ export * from './WikipediaMainPage';
 export * from './WikipediaNavigationMenu';
 export * from './WikipediaSaveChangesDialogPage';
 export * from './WikipediaVisualEditorPage';
+export * from './WikipediaWatchlistConfirmationPopupPage';
