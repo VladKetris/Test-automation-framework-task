@@ -1,9 +1,11 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { Frame, Page, Locator } from '@playwright/test';
+import { BasePage } from '@pages/BasePage';
 import { extractNumberFromString, normalizeString } from '@utils/string-utils';
 import { TestProductDetails } from '@sharedTypes/testTypes';
 
 const PRODUCTS_PAGE_TITLE = /all products/i;
+const AD_APPEAR_TIMEOUT = 3000;
+const AD_CLOSE_BUTTON_NAME = /close ad|close/i;
 
 export class TestProductsPage extends BasePage {
     private readonly productsContainer: Locator;
@@ -12,6 +14,7 @@ export class TestProductsPage extends BasePage {
     private readonly addToCartButtons: (index: number) => Locator;
     private readonly productNames: (index: number) => Locator;
     private readonly productPrices: (index: number) => Locator;
+    private readonly adCloseButtonInFrame: (frame: Frame) => Locator;
 
     constructor(page: Page) {
         super(
@@ -25,10 +28,42 @@ export class TestProductsPage extends BasePage {
         this.addToCartButtons = (index: number) => this.productInfoBlocks(index).locator('a.add-to-cart').describe('Add to cart button');
         this.productNames = (index: number) => this.productInfoBlocks(index).locator('p').describe('Product name');
         this.productPrices = (index: number) => this.productInfoBlocks(index).locator('h2').describe('Product price');
+        this.adCloseButtonInFrame = (frame: Frame) => frame.getByRole('button', { name: AD_CLOSE_BUTTON_NAME }).first().describe('Ad close button');
     }
 
     async getProductCount(): Promise<number> {
         return this.page.locator('.features_items .single-products').count();
+    }
+
+    /**
+     * Close the full-page ad when iframe is injected after page load
+     */
+    async closeAdContainerIfVisible(): Promise<void> {
+        const buttonToClick = await this.waitForValue(
+            () => this.findVisibleAdCloseButton(),
+            AD_APPEAR_TIMEOUT
+        );
+
+        if (!buttonToClick) {
+            return;
+        }
+
+        await buttonToClick.click({ force: true });
+    }
+
+    private async findVisibleAdCloseButton(): Promise<Locator | null> {
+        for (const frame of this.page.frames()) {
+            if (frame === this.page.mainFrame()) {
+                continue;
+            }
+
+            const frameCloseButton = this.adCloseButtonInFrame(frame);
+            if (await this.isLocatorVisible(frameCloseButton)) {
+                return frameCloseButton;
+            }
+        }
+
+        return null;
     }
 
     async verifyProductListVisible(): Promise<void> {

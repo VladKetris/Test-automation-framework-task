@@ -74,6 +74,35 @@ export class BasePage {
         return element;
     }
 
+    protected async isLocatorVisible(locator: Locator): Promise<boolean> {
+        try {
+            return await locator.isVisible();
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * Wait for a callback to return a non-null value without failing when the value never appears.
+     * @param callback - Function that returns the expected value or null while it is unavailable
+     * @param timeout - Maximum wait time in milliseconds
+     * @returns The first non-null value returned by the callback, or null when it never appears
+     */
+    protected async waitForValue<T>(callback: () => Promise<T | null>, timeout?: number): Promise<T | null> {
+        const state: { value: T | null } = { value: null };
+
+        try {
+            await expect(async () => {
+                state.value = await callback();
+                expect(state.value).not.toBeNull();
+            }).toPass({ timeout: timeout ?? this.defaultTimeout });
+        } catch {
+            return null;
+        }
+
+        return state.value;
+    }
+
     async verifyPageOpened(useSoftAssertions: boolean = false, timeout?: number): Promise<void> {
         const message = `${this.name} :: page should be opened`;
         await (useSoftAssertions ? expect.soft : expect)(this.formLocator, { message: message }).toBeVisible({ timeout: timeout ?? getEnvironment().timeouts.pageLoad });

@@ -14,7 +14,7 @@ export class WikipediaVisualEditorPage extends BasePage {
 
         this.heading = page.getByRole('heading', { level: 1 }).describe('Editor page heading');
         this.editorTextbox = editorTextbox;
-        this.publishButton = page.getByRole('button', { name: /Publish (page|changes)/i }).describe('Publish (page/changes) button');
+        this.publishButton = page.getByRole('button', { name: /Publish/i }).describe('Publish button');
     }
 
     async verifyHeadingContains(expectedTitle: string): Promise<void> {
