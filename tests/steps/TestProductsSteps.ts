@@ -10,6 +10,7 @@ export class TestProductsSteps {
 
     @step('Verify Products page is opened and list is visible')
     async verifyPageOpened(): Promise<void> {
+        await this.productsPage.closeAdContainerIfVisible();
         await this.productsPage.verifyPageOpened();
         await this.productsPage.verifyProductListVisible();
         expect(await this.productsPage.getProductCount()).toBeGreaterThan(1);

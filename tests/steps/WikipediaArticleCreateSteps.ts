@@ -10,7 +10,6 @@ export class WikipediaArticleCreateSteps {
 
     @step('Navigate to create new page')
     async navigateToCreateNewPage(): Promise<void> {
-        await this.navigationMenu.openMainMenu();
         await this.navigationMenu.clickCreateNewPageInSidebar();
     }
 
