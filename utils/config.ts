@@ -57,6 +57,12 @@ export interface TestEnvironment {
     };
 }
 
+export interface DemoblazeEnvironment {
+    baseUrl: string;
+    homeUrl: string;
+    cartUrl: string;
+}
+
 /**
  * Get current environment name from ENV variable
  * @default 'dev'
@@ -97,5 +103,13 @@ export function getTestEnvironment(): TestEnvironment {
         api: configData.api as TestEnvironment['api'],
         testSite: configData.testSite as TestEnvironment['testSite'],
         timeouts: configData.timeouts as TestEnvironment['timeouts']
+    };
+}
+
+export function getDemoblazeEnvironment(): DemoblazeEnvironment {
+    return {
+        baseUrl: process.env.DEMOBLAZE_BASE_URL || 'https://www.demoblaze.com',
+        homeUrl: process.env.DEMOBLAZE_HOME_URL || 'https://www.demoblaze.com/index.html',
+        cartUrl: process.env.DEMOBLAZE_CART_URL || 'https://www.demoblaze.com/cart.html',
     };
 }

@@ -10,3 +10,7 @@ export * from './TestAddedToCartPopupSteps';
 export * from './TestLoginSteps';
 export * from './TestProductsSteps';
 export * from './TestViewCartSteps';
+export * from './DemoblazeMainSteps';
+export * from './DemoblazeAuthSteps';
+export * from './DemoblazeCatalogSteps';
+export * from './DemoblazeCartSteps';
