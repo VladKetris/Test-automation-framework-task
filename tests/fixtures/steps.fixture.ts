@@ -13,6 +13,10 @@ import {
     TestLoginSteps,
     TestProductsSteps,
     TestViewCartSteps,
+    DemoblazeMainSteps,
+    DemoblazeAuthSteps,
+    DemoblazeCatalogSteps,
+    DemoblazeCartSteps,
 } from '@steps';
 import { WikipediaAuthSteps } from '@steps/WikipediaAuthSteps';
 
@@ -32,6 +36,10 @@ type StepsFixtures = {
     testLoginSteps: TestLoginSteps;
     testProductsSteps: TestProductsSteps;
     testViewCartSteps: TestViewCartSteps;
+    demoblazeMainSteps: DemoblazeMainSteps;
+    demoblazeAuthSteps: DemoblazeAuthSteps;
+    demoblazeCatalogSteps: DemoblazeCatalogSteps;
+    demoblazeCartSteps: DemoblazeCartSteps;
 };
 
 /**
@@ -93,6 +101,22 @@ export const test = apiTest.extend<StepsFixtures>({
 
     testViewCartSteps: async ({ testViewCartPage }, use) => {
         await use(new TestViewCartSteps(testViewCartPage));
+    },
+
+    demoblazeMainSteps: async ({ demoblazeHomePage }, use) => {
+        await use(new DemoblazeMainSteps(demoblazeHomePage));
+    },
+
+    demoblazeAuthSteps: async ({ page, demoblazeHomePage, demoblazeSignUpModalPage, demoblazeLoginModalPage }, use) => {
+        await use(new DemoblazeAuthSteps(page, demoblazeHomePage, demoblazeSignUpModalPage, demoblazeLoginModalPage));
+    },
+
+    demoblazeCatalogSteps: async ({ page, demoblazeHomePage, demoblazeProductPage }, use) => {
+        await use(new DemoblazeCatalogSteps(page, demoblazeHomePage, demoblazeProductPage));
+    },
+
+    demoblazeCartSteps: async ({ demoblazeCartPage }, use) => {
+        await use(new DemoblazeCartSteps(demoblazeCartPage));
     },
 });
 

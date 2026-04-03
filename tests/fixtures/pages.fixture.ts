@@ -21,7 +21,14 @@ import {
     TestProductsPage,
     TestAddedToCartPopupPage,
     TestViewCartPage,
+    DemoblazeHomePage,
+    DemoblazeSignUpModalPage,
+    DemoblazeLoginModalPage,
+    DemoblazeProductPage,
+    DemoblazeCartPage,
+    PageFactory,
 } from '@pages';
+import { withActionLogging } from '@utils/patterns/withActionLogging';
 
 /**
  * Page Object fixtures - creates all PO instances
@@ -42,6 +49,11 @@ type PagesFixtures = {
     testProductsPage: TestProductsPage;
     testAddedToCardPopupPage: TestAddedToCartPopupPage;
     testViewCartPage: TestViewCartPage;
+    demoblazeHomePage: DemoblazeHomePage;
+    demoblazeSignUpModalPage: DemoblazeSignUpModalPage;
+    demoblazeLoginModalPage: DemoblazeLoginModalPage;
+    demoblazeProductPage: DemoblazeProductPage;
+    demoblazeCartPage: DemoblazeCartPage;
 };
 
 
@@ -108,5 +120,25 @@ export const test = base.extend<AllPagesFixtures>({
 
     testViewCartPage: async ({ page }, use) => {
         await use(new TestViewCartPage(page));
+    },
+
+    demoblazeHomePage: async ({ page }, use) => {
+        await use(withActionLogging(PageFactory.create<DemoblazeHomePage>(page, 'demoblaze-home'), 'DemoblazeHomePage'));
+    },
+
+    demoblazeSignUpModalPage: async ({ page }, use) => {
+        await use(withActionLogging(PageFactory.create<DemoblazeSignUpModalPage>(page, 'demoblaze-signup-modal'), 'DemoblazeSignUpModalPage'));
+    },
+
+    demoblazeLoginModalPage: async ({ page }, use) => {
+        await use(withActionLogging(PageFactory.create<DemoblazeLoginModalPage>(page, 'demoblaze-login-modal'), 'DemoblazeLoginModalPage'));
+    },
+
+    demoblazeProductPage: async ({ page }, use) => {
+        await use(withActionLogging(PageFactory.create<DemoblazeProductPage>(page, 'demoblaze-product'), 'DemoblazeProductPage'));
+    },
+
+    demoblazeCartPage: async ({ page }, use) => {
+        await use(withActionLogging(PageFactory.create<DemoblazeCartPage>(page, 'demoblaze-cart'), 'DemoblazeCartPage'));
     },
 });
